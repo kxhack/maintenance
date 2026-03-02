@@ -745,19 +745,7 @@ function shareToFacebook() {
 }
 
 // Safari含む完全フォールバック対応
-window.copyShareUrl = async function() {
-  try {
-    await navigator.clipboard.writeText(currentShareUrl);
-  } catch (e) {
-    const textarea = document.createElement("textarea");
-    textarea.value = currentShareUrl;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand("copy");
-    document.body.removeChild(textarea);
-  }
-  showToast("URLをコピーしました", "ok");
-};
+
 
 async function handleDirectLink() {
   const params = new URLSearchParams(window.location.search);
