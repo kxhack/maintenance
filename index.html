@@ -407,9 +407,6 @@ html, body { height:100%; overflow:hidden; font-family:'Syne', sans-serif; backg
       <h3 style="margin-bottom:15px;">共有する</h3>
   
       <div style="display:flex; flex-direction:column; gap:10px;">
-        <button onclick="shareToX()">Xで共有</button>
-        <button onclick="shareToLine()">LINEで共有</button>
-        <button onclick="shareToFacebook()">Facebookで共有</button>
         <button onclick="copyShareUrl()">URLをコピー</button>
       </div>
   
@@ -693,6 +690,30 @@ window.openReportModalFromDetail = function() { document.getElementById("report-
 function getPostShareUrl(postId) {
   return `${window.location.origin}${window.location.pathname}?post=${postId}`;
 }
+
+window.sharePost = async function() {
+  if (!reportTargetPostId) return;
+
+  const shareUrl = getPostShareUrl(reportTargetPostId);
+
+  const shareData = {
+    title: "DREAMCORE MAP",
+    text: "夢のような体験を見つけました",
+    url: shareUrl
+  };
+
+  // Web Share API
+  if (navigator.share && navigator.canShare?.(shareData)) {
+    try {
+      await navigator.share(shareData);
+      return;
+    } catch (e) {
+      console.log("share cancelled");
+    }
+  }
+
+  openShareModal(shareUrl);
+};
 
 let currentShareUrl = "";
 
