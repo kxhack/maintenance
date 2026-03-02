@@ -694,30 +694,6 @@ function getPostShareUrl(postId) {
   return `${window.location.origin}${window.location.pathname}?post=${postId}`;
 }
 
-window.sharePost = async function() {
-  if (!reportTargetPostId) return;
-
-  const shareUrl = getPostShareUrl(reportTargetPostId);
-
-  const shareData = {
-    title: "DREAMCORE MAP",
-    text: "夢のような体験を見つけました",
-    url: shareUrl
-  };
-
-  // Web Share API
-  if (navigator.share && navigator.canShare?.(shareData)) {
-    try {
-      await navigator.share(shareData);
-      return;
-    } catch (e) {
-      console.log("share cancelled");
-    }
-  }
-
-  openShareModal(shareUrl);
-};
-
 let currentShareUrl = "";
 
 function openShareModal(url) {
@@ -729,23 +705,20 @@ window.closeShareModal = function() {
   document.getElementById("share-modal").style.display = "none";
 };
 
-function shareToX() {
-  const url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(currentShareUrl)}&text=${encodeURIComponent("DREAMCORE MAPで見つけた夢の体験")}`;
-  window.open(url, "_blank", "noopener,noreferrer");
-}
-
-function shareToLine() {
-  const url = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(currentShareUrl)}`;
-  window.open(url, "_blank", "noopener,noreferrer");
-}
-
-function shareToFacebook() {
-  const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentShareUrl)}`;
-  window.open(url, "_blank", "noopener,noreferrer");
-}
-
 // Safari含む完全フォールバック対応
-
+window.copyShareUrl = async function() {
+  try {
+    await navigator.clipboard.writeText(currentShareUrl);
+  } catch (e) {
+    const textarea = document.createElement("textarea");
+    textarea.value = currentShareUrl;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+  }
+  showToast("URLをコピーしました", "ok");
+};
 
 async function handleDirectLink() {
   const params = new URLSearchParams(window.location.search);
