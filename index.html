@@ -1,37 +1,1008 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>システムメンテナンス中です</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial;
-      background: #f7f7f7;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: #333;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ドリームコアマップ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400&family=Syne:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06050f;
+  --surface: #0d0b1e;
+  --border: rgba(180,160,255,0.12);
+  --accent: #c8b4ff;
+  --accent2: #7ecfff;
+  --text: #e8e0ff;
+  --muted: rgba(200,180,255,0.4);
+  --danger: #ff6b8a;
+  --glow: 0 0 30px rgba(200,180,255,0.15);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; font-family:'Syne', sans-serif; background:var(--bg); color:var(--text); }
+
+#header {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 24px;
+  background:linear-gradient(to bottom, rgba(6,5,15,0.98), transparent);
+  pointer-events:none;
+}
+#panel-header {
+    padding: 80px 16px 16px;
+}
+#header-title { font-size:18px; letter-spacing:0.12em; font-weight:300; pointer-events:auto; text-decoration: unset; color: var(--text); }
+#header-title span { color:var(--accent); }
+#post-btn {
+  pointer-events:auto;
+  background:linear-gradient(135deg, rgba(200,180,255,0.15), rgba(126,207,255,0.1));
+  border:1px solid var(--border); color:var(--accent); font-family:'Syne',sans-serif;
+  font-size:13px; letter-spacing:0.08em; padding:8px 20px; cursor:pointer;
+  transition:all 0.3s; backdrop-filter:blur(8px);
+}
+#post-btn:hover { background:rgba(200,180,255,0.25); border-color:rgba(200,180,255,0.4); box-shadow:var(--glow); }
+
+#map { width:100%; height:100%; }
+#map-overlay { position:absolute; inset:0; pointer-events:none; z-index:1; background:radial-gradient(ellipse at center, transparent 40%, rgba(6,5,15,0.5) 100%); }
+
+/* サイドパネル */
+#panel {
+  position:fixed; right:0; top:0; bottom:0; width:380px; z-index:50;
+  background:rgba(10,8,24,0.97); backdrop-filter:blur(20px);
+  border-left:1px solid var(--border);
+  transform:translateX(100%); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+#panel.open { transform:translateX(0); }
+#panel-header {
+  padding:80px 14px 16px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:10px; flex-shrink:0;
+}
+#panel-place-name {
+    text-align: center;
+  font-size:14px; font-weight:400; line-height:1.4; color:var(--accent);
+  flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+/* 地図に戻るボタン */
+#back-to-map-btn {
+  display:flex; align-items:center; gap:5px;
+  background:rgba(200,180,255,0.06); border:1px solid var(--border);
+  color:var(--muted); font-family:'Syne',sans-serif;
+  font-size:11px; letter-spacing:0.05em; padding:6px 10px;
+  cursor:pointer; transition:all 0.2s; flex-shrink:0; white-space:nowrap;
+}
+#back-to-map-btn:hover { background:rgba(200,180,255,0.14); color:var(--accent); border-color:rgba(200,180,255,0.35); }
+
+#panel-close {
+  background:none; border:none; color:var(--muted); cursor:pointer;
+  font-size:18px; line-height:1; padding:4px; transition:color 0.2s; flex-shrink:0;
+}
+#panel-close:hover { color:var(--accent); }
+
+/* SP: パネルを下から全画面 */
+@media (max-width:640px) {
+  #panel {
+    width:100%; left:0; right:0;
+    transform:translateY(100%);
+    border-left:none; border-top:1px solid var(--border);
+  }
+  #panel.open { transform:translateY(0); }
+  #post-btn { font-size:12px; padding:7px 14px; }
+}
+#panel-posts { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:12px; }
+#panel-posts::-webkit-scrollbar { width:4px; }
+#panel-posts::-webkit-scrollbar-thumb { background:rgba(200,180,255,0.2); border-radius:2px; }
+
+.post-card {
+  border:1px solid var(--border); border-radius:4px;
+  background:rgba(255,255,255,0.02); transition:all 0.2s; cursor:pointer;
+}
+.post-card:hover { border-color:rgba(200,180,255,0.4); background:rgba(200,180,255,0.04); transform:translateY(-1px); }
+.post-img { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; }
+.post-img-placeholder { width:100%; aspect-ratio:16/9; background:rgba(200,180,255,0.05); display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:12px; }
+.post-body { padding:12px; }
+.post-comment { font-family:'Noto Serif JP',serif; font-size:13px; line-height:1.7; color:rgba(232,224,255,0.85); }
+.post-meta { display:flex; justify-content:space-between; align-items:center; margin-top:10px; gap:8px; flex-wrap:wrap; }
+.post-time { font-size:11px; color:var(--muted); }
+.post-img-count { font-size:11px; color:var(--accent2); }
+.report-btn { background:none; border:none; color:var(--muted); font-size:11px; cursor:pointer; font-family:'Syne',sans-serif; letter-spacing:0.05em; transition:color 0.2s; padding:4px; margin-left:auto; }
+.report-btn:hover { color:var(--danger); }
+
+#panel-add-btn { margin:12px; padding:12px; background:rgba(200,180,255,0.06); border:1px dashed rgba(200,180,255,0.2); color:var(--muted); font-family:'Syne',sans-serif; font-size:13px; letter-spacing:0.06em; cursor:pointer; transition:all 0.2s; flex-shrink:0; }
+#panel-add-btn:hover { background:rgba(200,180,255,0.1); color:var(--accent); border-color:rgba(200,180,255,0.4); }
+
+/* 投稿モーダル */
+#modal-overlay {
+  position:fixed; inset:0; z-index:200;
+  background:rgba(6,5,15,0.85); backdrop-filter:blur(6px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity 0.3s;
+}
+#modal-overlay.open { opacity:1; pointer-events:auto; }
+#modal {
+  width:480px; max-width:calc(100vw - 40px); max-height:90vh; overflow-y:auto;
+  background:var(--surface); border:1px solid rgba(200,180,255,0.2);
+  padding:28px; position:relative;
+  transform:translateY(20px); transition:transform 0.3s;
+}
+#modal::-webkit-scrollbar { width:3px; }
+#modal-overlay.open #modal { transform:translateY(0); }
+#modal h2 { font-size:15px; letter-spacing:0.1em; font-weight:400; color:var(--accent); margin-bottom:24px; }
+.field { margin-bottom:18px; }
+.field label { display:block; font-size:11px; letter-spacing:0.1em; color:var(--muted); margin-bottom:8px; }
+
+#place-search-wrap { position:relative; }
+#place-search { width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--border); color:var(--text); font-family:'Syne',sans-serif; font-size:14px; padding:10px 14px; outline:none; transition:border-color 0.2s; }
+#place-search:focus { border-color:rgba(200,180,255,0.5); }
+#place-search::placeholder { color:var(--muted); }
+#place-results { position:absolute; top:100%; left:0; right:0; z-index:10; background:var(--surface); border:1px solid var(--border); border-top:none; max-height:200px; overflow-y:auto; display:none; }
+#place-results.show { display:block; }
+.place-result-item { padding:10px 14px; cursor:pointer; font-size:13px; border-bottom:1px solid var(--border); transition:background 0.15s; }
+.place-result-item:last-child { border-bottom:none; }
+.place-result-item:hover { background:rgba(200,180,255,0.08); }
+.place-result-item small { color:var(--muted); font-size:11px; display:block; margin-top:2px; }
+#selected-place { padding:8px 12px; background:rgba(200,180,255,0.08); border:1px solid rgba(200,180,255,0.2); font-size:13px; color:var(--accent); display:none; margin-top:6px; }
+#selected-place.show { display:block; }
+
+/* 画像アップロード */
+#img-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px; }
+.img-slot {
+  aspect-ratio:1; border:1px dashed rgba(200,180,255,0.2); border-radius:4px;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(255,255,255,0.02); cursor:pointer; position:relative; overflow:hidden;
+  transition:all 0.2s;
+}
+.img-slot:hover { border-color:rgba(200,180,255,0.5); background:rgba(200,180,255,0.06); }
+.img-slot.filled { border-style:solid; border-color:rgba(200,180,255,0.3); cursor:default; }
+.img-slot svg { opacity:0.3; }
+.img-slot img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.img-slot .remove-btn {
+  position:absolute; top:4px; right:4px; width:22px; height:22px; border-radius:50%;
+  background:rgba(6,5,15,0.88); border:1px solid rgba(255,107,138,0.6);
+  color:var(--danger); font-size:12px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.15s; z-index:2;
+}
+.img-slot .remove-btn:hover { background:rgba(255,107,138,0.25); }
+#img-add-btn {
+  display:none; align-items:center; justify-content:center; gap:6px;
+  padding:9px; background:rgba(200,180,255,0.04);
+  border:1px dashed rgba(200,180,255,0.15); color:var(--muted);
+  font-family:'Syne',sans-serif; font-size:12px; letter-spacing:0.05em;
+  cursor:pointer; transition:all 0.2s; position:relative; width:100%;
+}
+#img-add-btn:hover { background:rgba(200,180,255,0.08); border-color:rgba(200,180,255,0.3); color:var(--accent); }
+#img-add-btn input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+
+#comment-input { width:100%; height:80px; resize:none; background:rgba(255,255,255,0.04); border:1px solid var(--border); color:var(--text); font-family:'Noto Serif JP',serif; font-size:13px; padding:10px 14px; outline:none; transition:border-color 0.2s; line-height:1.6; }
+#comment-input:focus { border-color:rgba(200,180,255,0.5); }
+#char-count { text-align:right; font-size:11px; color:var(--muted); margin-top:4px; }
+#char-count.over { color:var(--danger); }
+#modal-actions { display:flex; gap:10px; margin-top:6px; }
+#submit-btn { flex:1; padding:12px; background:linear-gradient(135deg, rgba(200,180,255,0.2), rgba(126,207,255,0.1)); border:1px solid rgba(200,180,255,0.3); color:var(--accent); font-family:'Syne',sans-serif; font-size:13px; letter-spacing:0.08em; cursor:pointer; transition:all 0.2s; }
+#submit-btn:hover:not(:disabled) { background:rgba(200,180,255,0.3); }
+#submit-btn:disabled { opacity:0.4; cursor:not-allowed; }
+#cancel-btn { padding:12px 20px; background:none; border:1px solid var(--border); color:var(--muted); font-family:'Syne',sans-serif; font-size:13px; cursor:pointer; transition:all 0.2s; }
+#cancel-btn:hover { border-color:rgba(200,180,255,0.3); color:var(--text); }
+#modal-status { margin-top:12px; font-size:12px; text-align:center; min-height:16px; }
+#modal-status.error { color:var(--danger); }
+#modal-status.ok { color:#7effa0; }
+#modal-close { position:absolute; top:16px; right:16px; background:none; border:none; color:var(--muted); cursor:pointer; font-size:18px; }
+#modal-close:hover { color:var(--accent); }
+
+/* 投稿詳細モーダル */
+
+@media (max-width:640px) {
+    #panel-header {
+        padding: 65px 14px 16px;
     }
-    .box {
-      text-align: center;
-    }
-    h1 {
-      font-size: 24px;
-      margin-bottom: 12px;
-    }
-    p {
-      font-size: 14px;
-      opacity: 0.8;
-    }
-  </style>
+}
+#detail-overlay {
+  position:fixed; inset:0; z-index:250;
+  background:rgba(6,5,15,0.92); backdrop-filter:blur(8px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity 0.3s;
+}
+#detail-overlay.open { opacity:1; pointer-events:auto; }
+#detail-modal {
+  width:580px; max-width:calc(100vw - 40px); max-height:90vh;
+  background:var(--surface); border:1px solid rgba(200,180,255,0.2);
+  position:relative; overflow:hidden; display:flex; flex-direction:column;
+  transform:translateY(20px) scale(0.98); transition:transform 0.3s;
+}
+#detail-overlay.open #detail-modal { transform:translateY(0) scale(1); }
+#detail-close {
+  position:absolute; top:12px; right:12px; z-index:10;
+  background:rgba(6,5,15,0.8); border:1px solid var(--border);
+  color:var(--muted); cursor:pointer; font-size:14px;
+  width:30px; height:30px; display:flex; align-items:center; justify-content:center;
+  transition:all 0.2s; border-radius:2px;
+}
+#detail-close:hover { color:var(--accent); border-color:rgba(200,180,255,0.4); }
+
+/* シェアボタン */
+#detail-share-btn {
+  background:none;
+  border:1px solid var(--border);
+  color:var(--muted);
+  font-size:11px;
+  padding:4px 8px;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+
+#detail-share-btn:hover {
+  color:var(--accent);
+  border-color:rgba(200,180,255,0.4);
+}
+
+/* 画像スライダー */
+#detail-img-wrap { position:relative; width:100%; aspect-ratio:16/9; background:#060420; flex-shrink:0; overflow:hidden; }
+#detail-img-wrap img { width:100%; height:100%; object-fit:cover; display:block; transition:opacity 0.2s; }
+#detail-no-img { width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:13px; }
+.slider-btn {
+  position:absolute; top:50%; transform:translateY(-50%);
+  background:rgba(6,5,15,0.7); border:1px solid rgba(200,180,255,0.2);
+  color:var(--text); width:36px; height:36px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; font-size:20px;
+  transition:all 0.2s; z-index:5; border-radius:2px;
+}
+.slider-btn:hover { background:rgba(200,180,255,0.15); border-color:rgba(200,180,255,0.5); }
+#slider-prev { left:10px; }
+#slider-next { right:10px; }
+#slider-dots { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:6px; }
+.slider-dot { width:6px; height:6px; border-radius:50%; background:rgba(200,180,255,0.3); transition:all 0.2s; cursor:pointer; border:none; }
+.slider-dot.active { background:var(--accent); transform:scale(1.3); }
+
+#detail-body { padding:20px 24px; overflow-y:auto; }
+#detail-body::-webkit-scrollbar { width:3px; }
+#detail-place { font-size:12px; letter-spacing:0.08em; color:var(--accent2); margin-bottom:10px; }
+#detail-comment { font-family:'Noto Serif JP',serif; font-size:15px; line-height:1.85; color:var(--text); }
+#detail-footer { display:flex; justify-content:space-between; align-items:center; margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
+#detail-time { font-size:11px; color:var(--muted); }
+#detail-report-btn { background:none; border:none; color:var(--muted); font-size:11px; cursor:pointer; font-family:'Syne',sans-serif; transition:color 0.2s; padding:4px; }
+#detail-report-btn:hover { color:var(--danger); }
+
+/* 通報モーダル */
+#report-modal-overlay {
+  position:fixed; inset:0; z-index:350;
+  background:rgba(6,5,15,0.9); backdrop-filter:blur(4px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity 0.2s;
+}
+#report-modal-overlay.open { opacity:1; pointer-events:auto; }
+#report-modal { width:320px; background:var(--surface); border:1px solid rgba(255,107,138,0.3); padding:24px; transform:translateY(10px); transition:transform 0.2s; }
+#report-modal-overlay.open #report-modal { transform:translateY(0); }
+#report-modal h3 { font-size:14px; color:var(--danger); letter-spacing:0.08em; margin-bottom:16px; font-weight:400; }
+.report-reason { width:100%; padding:10px 12px; margin-bottom:8px; background:rgba(255,107,138,0.05); border:1px solid rgba(255,107,138,0.15); color:var(--text); font-family:'Syne',sans-serif; font-size:13px; cursor:pointer; text-align:left; transition:all 0.2s; }
+.report-reason:hover { background:rgba(255,107,138,0.12); border-color:rgba(255,107,138,0.4); }
+#report-cancel { background:none; border:none; color:var(--muted); font-size:12px; cursor:pointer; margin-top:8px; font-family:'Syne',sans-serif; }
+
+#toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:rgba(13,11,30,0.95); border:1px solid var(--border); padding:10px 20px; font-size:13px; z-index:500; opacity:0; transition:all 0.3s; pointer-events:none; backdrop-filter:blur(8px); }
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+#toast.err { border-color:rgba(255,107,138,0.4); color:var(--danger); }
+#toast.ok { border-color:rgba(126,255,160,0.3); color:#7effa0; }
+
+#loading { position:fixed; inset:0; z-index:600; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; transition:opacity 0.6s; }
+#loading.hidden { opacity:0; pointer-events:none; }
+.loading-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin:0 3px; animation:pulse 1.2s ease-in-out infinite; }
+.loading-dot:nth-child(2) { animation-delay:0.2s; }
+.loading-dot:nth-child(3) { animation-delay:0.4s; }
+@keyframes pulse { 0%,100%{opacity:0.2;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }
+* { scrollbar-width:thin; scrollbar-color:rgba(200,180,255,0.2) transparent; }
+</style>
 </head>
 <body>
-  <div class="box">
-    <h1>現在システムメンテナンス中です</h1>
-    <p>ご不便をおかけしますが、しばらくお待ちください。</p>
+
+<div id="loading">
+  <div style="font-size:13px;letter-spacing:0.15em;color:var(--muted)">DREAMCORE MAP</div>
+  <div><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></div>
+</div>
+
+<div id="header">
+  <a href="/" id="header-title">DREAM<span>CORE</span> MAP</a>
+  <button id="post-btn" onclick="openModal()">+ 投稿する</button>
+</div>
+
+<div id="map"></div>
+<div id="map-overlay"></div>
+
+<!-- サイドパネル -->
+<div id="panel">
+  <div id="panel-header">
+    <div id="panel-place-name"></div>
+    <button id="panel-close" onclick="closePanel()">✕</button>
   </div>
+  <div id="panel-posts"></div>
+  <button id="panel-add-btn" onclick="openModalForPlace()">この場所に投稿する</button>
+</div>
+
+<!-- 投稿モーダル -->
+<div id="modal-overlay">
+  <div id="modal">
+    <button id="modal-close" onclick="closeModal()">✕</button>
+    <h2>ドリームコアを記録する</h2>
+
+    <div class="field">
+      <label>施設を検索</label>
+      <div id="place-search-wrap">
+        <input id="place-search" type="text" placeholder="施設名・住所で検索..." autocomplete="off">
+        <div id="place-results"></div>
+      </div>
+      <div id="selected-place"></div>
+    </div>
+
+    <div class="field">
+      <label>画像（1〜3枚・必須）</label>
+      <div id="img-grid">
+        <div class="img-slot" id="slot-0" onclick="triggerImgInput()">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        </div>
+        <div class="img-slot" id="slot-1" style="display:none"></div>
+        <div class="img-slot" id="slot-2" style="display:none"></div>
+      </div>
+      <button id="img-add-btn">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        画像を追加（最大3枚）
+        <input type="file" id="img-input" accept="image/*">
+      </button>
+    </div>
+
+    <div class="field">
+      <label>コメント（最大200文字）</label>
+      <textarea id="comment-input"></textarea>
+      <div id="char-count">0 / 200</div>
+    </div>
+
+    <div id="modal-actions">
+      <button id="cancel-btn" onclick="closeModal()">キャンセル</button>
+      <button id="submit-btn" onclick="submitPost()" disabled>投稿する</button>
+    </div>
+    <div id="modal-status"></div>
+  </div>
+</div>
+
+<!-- 投稿詳細モーダル -->
+<div id="detail-overlay" onclick="handleDetailOverlayClick(event)">
+  <div id="detail-modal">
+    <button id="detail-close" onclick="closeDetailModal()">✕</button>
+    <div id="detail-img-wrap">
+      <img id="detail-img" src="" alt="" style="display:none">
+      <div id="detail-no-img" style="display:none">画像なし</div>
+      <button class="slider-btn" id="slider-prev" onclick="slideImg(-1)" style="display:none">‹</button>
+      <button class="slider-btn" id="slider-next" onclick="slideImg(1)" style="display:none">›</button>
+      <div id="slider-dots"></div>
+    </div>
+    <div id="detail-body">
+      <div id="detail-place"></div>
+      <div id="detail-comment"></div>
+      <div id="detail-footer">
+        <span id="detail-time"></span>
+        <div style="display:flex; gap:10px;">
+          <button id="detail-share-btn" onclick="sharePost()">シェア</button>
+          <button id="detail-report-btn" onclick="openReportModalFromDetail()">通報</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 通報モーダル -->
+<div id="report-modal-overlay">
+  <div id="report-modal">
+    <h3>通報する</h3>
+    <button class="report-reason" onclick="submitReport('inappropriate')">不適切なコンテンツ</button>
+    <button class="report-reason" onclick="submitReport('spam')">スパム・宣伝</button>
+    <button class="report-reason" onclick="submitReport('location')">場所の情報が誤っている</button>
+    <button class="report-reason" onclick="submitReport('other')">その他</button>
+    <br>
+    <button id="report-cancel" onclick="closeReportModal()">キャンセル</button>
+  </div>
+</div>
+
+<!-- シェアモーダル -->
+<div id="share-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:999; align-items:center; justify-content:center;">
+    <div style="background:#111; padding:20px; width:300px; text-align:center;">
+      <h3 style="margin-bottom:15px;">共有する</h3>
+  
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button onclick="shareToX()">Xで共有</button>
+        <button onclick="shareToLine()">LINEで共有</button>
+        <button onclick="shareToFacebook()">Facebookで共有</button>
+        <button onclick="copyShareUrl()">URLをコピー</button>
+      </div>
+  
+      <button style="margin-top:15px;" onclick="closeShareModal()">閉じる</button>
+    </div>
+  </div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, collection, addDoc, getDocs, query, orderBy,
+  where, Timestamp, updateDoc, doc, increment, getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+// =============================
+// CONFIG — 自分のFirebaseプロジェクト設定に書き換えてください
+// =============================
+const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyCrC0lX-x9QncxBAgfIBCPOjD7W1s5k9ig",
+  authDomain: "dreamcore-map.firebaseapp.com",
+  projectId: "dreamcore-map",
+  storageBucket: "dreamcore-map.firebasestorage.app",
+  messagingSenderId: "784326416813",
+  appId: "1:784326416813:web:c9f1721cbde26cbbbda924",
+  measurementId: "G-9JRW4TGY1W"
+};
+const GOOGLE_MAPS_KEY = "AIzaSyC4M7nqU1hw9trte_zIzMvM1MP3TCl7320";
+const OPENAI_KEY = "YOUR_OPENAI_API_KEY"; // Moderation API用（サーバーサイドでの管理を推奨）
+
+// =============================
+const app = initializeApp(FIREBASE_CONFIG);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+let map, autocompleteService, placesService;
+let selectedPlace = null;
+let selectedFiles = [];
+let currentPanelPlaceId = null;
+let reportTargetPostId = null;
+let markers = {};
+let currentUserId = null;
+let currentDetailImages = [];
+let currentSlideIndex = 0;
+
+// ===== AUTH =====
+async function init() {
+  try {
+    const cred = await signInAnonymously(auth);
+    currentUserId = cred.user.uid;
+    loadGoogleMaps();
+  } catch(e) {
+    console.error("Auth error:", e);
+    showToast("認証エラーが発生しました", "err");
+    hideLoading();
+  }
+}
+
+// ===== Google Maps =====
+function loadGoogleMaps() {
+  const script = document.createElement("script");
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places&language=ja&region=JP&loading=async&callback=initMap`;
+  script.async = true; script.defer = true;
+  document.head.appendChild(script);
+}
+
+window.initMap = async function() {
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: 35.6762, lng: 139.6503 },
+    zoom: 12,
+    disableDefaultUI: false,
+    zoomControl: true, mapTypeControl: false, streetViewControl: false, fullscreenControl: false,
+    styles: [
+      { elementType:"geometry", stylers:[{color:"#0a0818"}] },
+      { elementType:"labels.text.fill", stylers:[{color:"#8b7fc0"}] },
+      { elementType:"labels.text.stroke", stylers:[{color:"#06050f"}] },
+      { featureType:"road", elementType:"geometry", stylers:[{color:"#1a1530"}] },
+      { featureType:"road.highway", elementType:"geometry", stylers:[{color:"#251e40"}] },
+      { featureType:"water", elementType:"geometry", stylers:[{color:"#060420"}] },
+      { featureType:"poi", elementType:"geometry", stylers:[{color:"#0e0c20"}] },
+      { featureType:"poi.park", elementType:"geometry", stylers:[{color:"#0d1220"}] },
+      { featureType:"transit", elementType:"geometry", stylers:[{color:"#12103a"}] }
+    ]
+  });
+  autocompleteService = new google.maps.places.AutocompleteService();
+  placesService = new google.maps.places.PlacesService(map);
+  await loadAllPins();
+  handleDirectLink();
+  hideLoading();
+};
+
+// ===== Load pins =====
+async function loadAllPins() {
+  try {
+    const q = query(collection(db, "pins"), where("report_count", "<", 3), orderBy("report_count"), orderBy("created_at", "desc"));
+    const snap = await getDocs(q);
+    const seen = new Set();
+    snap.forEach(d => {
+      const data = d.data();
+      if (!seen.has(data.place_id)) {
+        seen.add(data.place_id);
+        addMarker(data.place_id, data);
+      }
+    });
+  } catch(e) { console.warn("loadAllPins error:", e); }
+}
+
+// ===== Marker（「D」入りカスタムピン） =====
+function addMarker(placeId, data) {
+  if (markers[placeId]) return;
+
+  // SVGピンを作成（「D」の文字入り）
+  const svgPin = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="44" viewBox="0 0 36 44" style="filter:drop-shadow(0 4px 12px rgba(200,180,255,0.5)) drop-shadow(0 0 6px rgba(200,180,255,0.3))">
+      <!-- ピン本体 -->
+      <path d="M18 2C10.268 2 4 8.268 4 16c0 10 14 26 14 26S32 26 32 16C32 8.268 25.732 2 18 2z"
+        fill="#1a1535" stroke="#c8b4ff" stroke-width="1.5"/>
+      <!-- 内側の円 -->
+      <circle cx="18" cy="16" r="9" fill="rgba(200,180,255,0.12)" stroke="rgba(200,180,255,0.4)" stroke-width="1"/>
+      <!-- D の文字 -->
+      <text x="18" y="21" text-anchor="middle" font-family="'Syne', sans-serif" font-size="11" font-weight="700" fill="#c8b4ff" letter-spacing="0">D</text>
+    </svg>`;
+
+  const el = document.createElement("div");
+  el.innerHTML = svgPin;
+  el.style.cssText = "cursor:pointer; transform-origin:bottom center; transition:transform 0.2s;";
+  el.onmouseenter = () => el.style.transform = "scale(1.2)";
+  el.onmouseleave = () => el.style.transform = "scale(1)";
+
+  // AdvancedMarkerElementが使える場合はそちら、使えない場合はオーバーレイで代替
+  let marker;
+  try {
+    marker = new google.maps.marker.AdvancedMarkerElement({
+      map, position: { lat: data.lat, lng: data.lng },
+      content: el, title: data.place_name
+    });
+    marker.addListener("click", () => {
+      map.panTo({ lat: data.lat, lng: data.lng });
+      if (map.getZoom() < 15) map.setZoom(15);
+      setTimeout(() => openPanel(data.place_id, data.place_name), 300);
+    });
+  } catch(e) {
+    // フォールバック: 通常Markerを使用
+    marker = new google.maps.Marker({
+      map,
+      position: { lat: data.lat, lng: data.lng },
+      title: data.place_name,
+      icon: {
+        url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="44" viewBox="0 0 36 44">
+            <path d="M18 2C10.268 2 4 8.268 4 16c0 10 14 26 14 26S32 26 32 16C32 8.268 25.732 2 18 2z" fill="#1a1535" stroke="#c8b4ff" stroke-width="1.5"/>
+            <circle cx="18" cy="16" r="9" fill="rgba(200,180,255,0.12)" stroke="rgba(200,180,255,0.4)" stroke-width="1"/>
+            <text x="18" y="21" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#c8b4ff">D</text>
+          </svg>`)}`,
+        scaledSize: new google.maps.Size(36, 44),
+        anchor: new google.maps.Point(18, 44),
+      },
+      zIndex: 10
+    });
+    marker.addListener("click", () => {
+      map.panTo({ lat: data.lat, lng: data.lng });
+      if (map.getZoom() < 15) map.setZoom(15);
+      setTimeout(() => openPanel(data.place_id, data.place_name), 300);
+    });
+  }
+
+  markers[placeId] = marker;
+}
+
+// ===== Panel =====
+async function openPanel(placeId, placeName) {
+  currentPanelPlaceId = placeId;
+  document.getElementById("panel-place-name").textContent = placeName;
+  document.getElementById("panel-posts").innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">読み込み中...</div>';
+  document.getElementById("panel").classList.add("open");
+  const q = query(collection(db, "pins"), where("place_id", "==", placeId), orderBy("created_at", "desc"));
+  const snap = await getDocs(q);
+  renderPosts(snap);
+}
+
+function renderPosts(snap) {
+  const container = document.getElementById("panel-posts");
+  container.innerHTML = "";
+  let count = 0;
+  snap.forEach(d => {
+    const data = d.data();
+    if (data.report_count >= 3) return;
+    count++;
+    const images = Array.isArray(data.image_urls) ? data.image_urls : (data.image_url ? [data.image_url] : []);
+    const firstImg = images[0] || null;
+    const timeStr = data.created_at ? new Date(data.created_at.toDate()).toLocaleDateString("ja-JP") : "";
+
+    const card = document.createElement("div");
+    card.className = "post-card";
+    card.dataset.id = d.id;
+    card.innerHTML = `
+      ${firstImg ? `<img class="post-img" src="${firstImg}" alt="" loading="lazy">` : `<div class="post-img-placeholder">画像なし</div>`}
+      <div class="post-body">
+        <div class="post-comment">${escapeHtml(data.comment)}</div>
+        <div class="post-meta">
+          <span class="post-time">${timeStr}</span>
+          ${images.length > 1 ? `<span class="post-img-count">📷 ${images.length}枚</span>` : ""}
+          <button class="report-btn" onclick="event.stopPropagation(); openReportModal('${d.id}')">通報</button>
+        </div>
+      </div>`;
+    card.addEventListener("click", () => openDetailModal(data, d.id));
+    container.appendChild(card);
+  });
+  if (count === 0) container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">まだ投稿がありません</div>';
+}
+
+window.closePanel = function() {
+  document.getElementById("panel").classList.remove("open");
+  currentPanelPlaceId = null;
+};
+
+// ===== 投稿詳細モーダル =====
+window.openDetailModal = function(data, postId) {
+  const images = Array.isArray(data.image_urls) ? data.image_urls : (data.image_url ? [data.image_url] : []);
+  currentDetailImages = images;
+  currentSlideIndex = 0;
+  reportTargetPostId = postId;
+  document.getElementById("detail-place").textContent = data.place_name || "";
+  document.getElementById("detail-comment").textContent = data.comment || "";
+  const timeStr = data.created_at ? new Date(data.created_at.toDate()).toLocaleDateString("ja-JP") : "";
+  document.getElementById("detail-time").textContent = timeStr;
+  updateSlider();
+  document.getElementById("detail-overlay").classList.add("open");
+};
+
+function updateSlider() {
+  const img = document.getElementById("detail-img");
+  const noImg = document.getElementById("detail-no-img");
+  const prev = document.getElementById("slider-prev");
+  const next = document.getElementById("slider-next");
+  const dots = document.getElementById("slider-dots");
+
+  if (currentDetailImages.length === 0) {
+    img.style.display = "none"; noImg.style.display = "flex";
+    prev.style.display = "none"; next.style.display = "none";
+    dots.innerHTML = ""; return;
+  }
+  img.src = currentDetailImages[currentSlideIndex];
+  img.style.display = "block"; noImg.style.display = "none";
+  const multi = currentDetailImages.length > 1;
+  prev.style.display = multi ? "flex" : "none";
+  next.style.display = multi ? "flex" : "none";
+  dots.innerHTML = "";
+  currentDetailImages.forEach((_, i) => {
+    const dot = document.createElement("button");
+    dot.className = "slider-dot" + (i === currentSlideIndex ? " active" : "");
+    dot.onclick = () => { currentSlideIndex = i; updateSlider(); };
+    dots.appendChild(dot);
+  });
+}
+
+window.slideImg = function(dir) {
+  if (!currentDetailImages || currentDetailImages.length === 0) return;
+
+  currentSlideIndex =
+    (currentSlideIndex + dir + currentDetailImages.length) %
+    currentDetailImages.length;
+
+  updateSlider();
+};
+
+document.getElementById("detail-modal").addEventListener("click", e => {
+  e.stopPropagation();
+});
+
+window.closeDetailModal = function() { document.getElementById("detail-overlay").classList.remove("open"); };
+window.handleDetailOverlayClick = function(e) { if (e.target === document.getElementById("detail-overlay")) closeDetailModal(); };
+window.openReportModalFromDetail = function() { document.getElementById("report-modal-overlay").classList.add("open"); };
+
+
+// シェア機能
+function getPostShareUrl(postId) {
+  return `${window.location.origin}${window.location.pathname}?post=${postId}`;
+}
+
+window.sharePost = async function() {
+  if (!reportTargetPostId) return;
+
+  const shareUrl = getPostShareUrl(reportTargetPostId);
+
+  const shareData = {
+    title: "DREAMCORE MAP",
+    text: "夢のような体験を見つけました",
+    url: shareUrl
+  };
+
+  // Web Share API
+  if (navigator.share && navigator.canShare?.(shareData)) {
+    try {
+      await navigator.share(shareData);
+      return;
+    } catch (e) {
+      console.log("share cancelled");
+    }
+  }
+
+  openShareModal(shareUrl);
+};
+
+let currentShareUrl = "";
+
+function openShareModal(url) {
+  currentShareUrl = url;
+  document.getElementById("share-modal").style.display = "flex";
+}
+
+window.closeShareModal = function() {
+  document.getElementById("share-modal").style.display = "none";
+};
+
+function shareToX() {
+  const url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(currentShareUrl)}&text=${encodeURIComponent("DREAMCORE MAPで見つけた夢の体験")}`;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function shareToLine() {
+  const url = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(currentShareUrl)}`;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function shareToFacebook() {
+  const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentShareUrl)}`;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+// Safari含む完全フォールバック対応
+window.copyShareUrl = async function() {
+  try {
+    await navigator.clipboard.writeText(currentShareUrl);
+  } catch (e) {
+    const textarea = document.createElement("textarea");
+    textarea.value = currentShareUrl;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+  }
+  showToast("URLをコピーしました", "ok");
+};
+
+async function handleDirectLink() {
+  const params = new URLSearchParams(window.location.search);
+  const postId = params.get("post");
+  if (!postId) return;
+
+  try {
+    const snap = await getDoc(doc(db, "pins", postId));
+    if (!snap.exists()) return;
+
+    const data = snap.data();
+
+    // マップ移動
+    map.panTo({ lat: data.lat, lng: data.lng });
+    map.setZoom(15);
+
+    // パネル開く
+    setTimeout(() => {
+      openPanel(data.place_id, data.place_name);
+      setTimeout(() => {
+        openDetailModal(data, postId);
+      }, 500);
+    }, 400);
+
+  } catch (e) {
+    console.warn("direct link error", e);
+  }
+}
+
+
+// ===== 投稿モーダル =====
+window.openModal = function() {
+  selectedPlace = null; selectedFiles = [];
+  document.getElementById("selected-place").classList.remove("show");
+  document.getElementById("place-search").value = "";
+  document.getElementById("comment-input").value = "";
+  document.getElementById("char-count").textContent = "0 / 200";
+  document.getElementById("modal-status").textContent = "";
+  resetImgSlots();
+  validateForm();
+  document.getElementById("modal-overlay").classList.add("open");
+};
+window.openModalForPlace = function() { openModal(); };
+window.closeModal = function() { document.getElementById("modal-overlay").classList.remove("open"); };
+
+function resetImgSlots() {
+  for (let i = 0; i < 3; i++) {
+    const slot = document.getElementById(`slot-${i}`);
+    slot.innerHTML = ""; slot.classList.remove("filled");
+    if (i === 0) {
+      slot.style.display = "";
+      slot.innerHTML = `<svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>`;
+      slot.onclick = () => triggerImgInput();
+    } else {
+      slot.style.display = "none"; slot.onclick = null;
+    }
+  }
+  document.getElementById("img-add-btn").style.display = "none";
+}
+
+window.triggerImgInput = function() {
+  const input = document.createElement("input");
+  input.type = "file"; input.accept = "image/*";
+  input.onchange = e => { if (e.target.files[0]) handleImageFile(e.target.files[0]); };
+  input.click();
+};
+
+document.getElementById("img-input").addEventListener("change", e => {
+  if (e.target.files[0]) handleImageFile(e.target.files[0]);
+  e.target.value = "";
+});
+
+function handleImageFile(file) {
+  if (selectedFiles.length >= 3) { showToast("画像は最大3枚です", "err"); return; }
+  if (file.size > 10 * 1024 * 1024) { showToast("画像は10MB以下にしてください", "err"); return; }
+  const idx = selectedFiles.length;
+  selectedFiles.push(file);
+  const reader = new FileReader();
+  reader.onload = e => {
+    const slot = document.getElementById(`slot-${idx}`);
+    slot.style.display = ""; slot.classList.add("filled"); slot.onclick = null;
+    slot.innerHTML = `<img src="${e.target.result}" alt=""><button class="remove-btn" onclick="event.stopPropagation(); removeImage(${idx})">✕</button>`;
+    document.getElementById("img-add-btn").style.display = selectedFiles.length < 3 ? "flex" : "none";
+    validateForm();
+  };
+  reader.readAsDataURL(file);
+}
+
+window.removeImage = function(idx) {
+  const files = [...selectedFiles];
+  files.splice(idx, 1);
+  selectedFiles = [];
+  resetImgSlots();
+  files.forEach(f => handleImageFile(f));
+  validateForm();
+};
+
+// ===== Place Search =====
+let searchTimeout;
+document.getElementById("place-search").addEventListener("input", e => {
+  clearTimeout(searchTimeout);
+  const val = e.target.value.trim();
+  if (val.length < 2) { document.getElementById("place-results").classList.remove("show"); return; }
+  searchTimeout = setTimeout(() => searchPlaces(val), 400);
+});
+
+function searchPlaces(q) {
+  autocompleteService.getPlacePredictions({ input: q, componentRestrictions: { country: "jp" }, types: ["establishment"] }, (preds, status) => {
+    const res = document.getElementById("place-results");
+    res.innerHTML = "";
+    if (!preds || status !== google.maps.places.PlacesServiceStatus.OK) { res.classList.remove("show"); return; }
+    preds.slice(0, 5).forEach(p => {
+      const item = document.createElement("div");
+      item.className = "place-result-item";
+      item.innerHTML = `${escapeHtml(p.structured_formatting.main_text)}<small>${escapeHtml(p.structured_formatting.secondary_text || "")}</small>`;
+      item.onclick = () => selectPlace(p.place_id);
+      res.appendChild(item);
+    });
+    res.classList.add("show");
+  });
+}
+
+function selectPlace(placeId) {
+  placesService.getDetails({ placeId, fields: ["place_id","name","geometry"] }, (place, status) => {
+    if (status !== google.maps.places.PlacesServiceStatus.OK) return;
+    selectedPlace = { place_id: place.place_id, place_name: place.name, lat: place.geometry.location.lat(), lng: place.geometry.location.lng() };
+    document.getElementById("place-search").value = "";
+    document.getElementById("place-results").classList.remove("show");
+    const sel = document.getElementById("selected-place");
+    sel.textContent = "✓ " + place.name; sel.classList.add("show");
+    validateForm();
+  });
+}
+
+// ===== Comment =====
+document.getElementById("comment-input").addEventListener("input", () => {
+  const len = document.getElementById("comment-input").value.length;
+  const cc = document.getElementById("char-count");
+  cc.textContent = `${len} / 200`; cc.className = len > 200 ? "over" : "";
+  validateForm();
+});
+
+function validateForm() {
+  const ok = selectedPlace && selectedFiles.length > 0 && document.getElementById("comment-input").value.length > 0 && document.getElementById("comment-input").value.length <= 200;
+  document.getElementById("submit-btn").disabled = !ok;
+}
+
+// ===== Submit =====
+window.submitPost = async function() {
+  if (!selectedPlace || selectedFiles.length === 0) return;
+  const comment = document.getElementById("comment-input").value.trim();
+  setStatus("モデレーション中...", "");
+  document.getElementById("submit-btn").disabled = true;
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayTs = Timestamp.fromDate(today);
+  const countQ = query(collection(db,"pins"), where("user_id","==",currentUserId), where("created_at",">=",todayTs));
+  const countSnap = await getDocs(countQ);
+  if (countSnap.size >= 5) { setStatus("1日の投稿上限（5件）に達しました", "error"); document.getElementById("submit-btn").disabled = false; return; }
+
+  try {
+    const modOk = await moderateText(comment);
+    if (!modOk) { setStatus("テキストがポリシーに違反しています", "error"); document.getElementById("submit-btn").disabled = false; return; }
+  } catch(e) { console.warn("Moderation skip:", e); }
+
+  // 複数画像アップロード
+  const imageUrls = [];
+  for (let i = 0; i < selectedFiles.length; i++) {
+    setStatus(`画像をアップロード中... (${i+1}/${selectedFiles.length})`, "");
+    const file = selectedFiles[i];
+    const ext = file.name.split(".").pop();
+    const storageRef = ref(storage, `pins/${Date.now()}_${i}_${currentUserId}.${ext}`);
+    const snap = await uploadBytes(storageRef, file);
+    imageUrls.push(await getDownloadURL(snap.ref));
+  }
+
+  setStatus("投稿を保存中...", "");
+  const docRef = await addDoc(collection(db, "pins"), {
+    place_id: selectedPlace.place_id,
+    place_name: selectedPlace.place_name,
+    lat: selectedPlace.lat, lng: selectedPlace.lng,
+    image_urls: imageUrls,
+    image_url: imageUrls[0] || "",
+    comment,
+    created_at: Timestamp.now(),
+    report_count: 0,
+    user_id: currentUserId
+  });
+
+  addMarker(selectedPlace.place_id, { ...selectedPlace, image_urls: imageUrls, image_url: imageUrls[0], report_count: 0 });
+  setStatus("投稿しました！", "ok");
+  setTimeout(() => { closeModal(); openPanel(selectedPlace.place_id, selectedPlace.place_name); }, 1000);
+};
+
+async function moderateText(text) {
+  if (!OPENAI_KEY) return true;
+  const res = await fetch("https://api.openai.com/v1/moderations", {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${OPENAI_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ input: text })
+  });
+  const data = await res.json();
+  return !data.results?.[0]?.flagged;
+}
+
+function setStatus(msg, type) { const el = document.getElementById("modal-status"); el.textContent = msg; el.className = type; }
+
+// ===== Report =====
+window.openReportModal = function(postId) {
+  reportTargetPostId = postId;
+  document.getElementById("report-modal-overlay").classList.add("open");
+};
+window.closeReportModal = function() { document.getElementById("report-modal-overlay").classList.remove("open"); };
+
+window.submitReport = async function(reason) {
+  if (!reportTargetPostId) return;
+  const postRef = doc(db, "pins", reportTargetPostId);
+  await updateDoc(postRef, { report_count: increment(1) });
+  const updated = await getDoc(postRef);
+  if (updated.data()?.report_count >= 3) {
+    const card = document.querySelector(`.post-card[data-id="${reportTargetPostId}"]`);
+    if (card) card.style.display = "none";
+  }
+  closeReportModal(); closeDetailModal();
+  showToast("通報を受け付けました", "ok");
+};
+
+// ===== Utils =====
+window.showToast = function(msg, type = "") {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.className = `show ${type}`;
+  setTimeout(() => t.className = "", 3000);
+};
+
+function hideLoading() {
+  const l = document.getElementById("loading");
+  l.classList.add("hidden");
+  setTimeout(() => l.style.display = "none", 600);
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+
+init();
+</script>
 </body>
 </html>
