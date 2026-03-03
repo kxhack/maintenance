@@ -8,130 +8,99 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400&family=Syne:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #06050f;
-  --surface: #0d0b1e;
-  --border: rgba(180,160,255,0.12);
-  --accent: #c8b4ff;
-  --accent2: #7ecfff;
-  --text: #e8e0ff;
-  --muted: rgba(200,180,255,0.4);
-  --danger: #ff6b8a;
+  --bg: #06050f; --surface: #0d0b1e; --border: rgba(180,160,255,0.12);
+  --accent: #c8b4ff; --accent2: #7ecfff; --text: #e8e0ff;
+  --muted: rgba(200,180,255,0.4); --danger: #ff6b8a; --heart: #ff6b8a;
   --glow: 0 0 30px rgba(200,180,255,0.15);
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-html, body { height:100%; overflow:hidden; font-family:'Syne', sans-serif; background:var(--bg); color:var(--text); }
+html, body { height:100%; overflow:hidden; font-family:'Syne',sans-serif; background:var(--bg); color:var(--text); }
 
-#header {
-  position:fixed; top:0; left:0; right:0; z-index:100;
-  display:flex; align-items:center; justify-content:space-between;
-  padding:16px 24px;
-  background:linear-gradient(to bottom, rgba(6,5,15,0.98), transparent);
-  pointer-events:none;
-}
-#panel-header {
-    padding: 80px 16px 16px;
-}
-#header-title { font-size:18px; letter-spacing:0.12em; font-weight:300; pointer-events:auto; text-decoration: unset; color: var(--text); }
+#header { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:16px 24px; background:linear-gradient(to bottom,rgba(6,5,15,0.98),transparent); pointer-events:none; }
+#header-title { font-size:18px; letter-spacing:0.12em; font-weight:300; pointer-events:auto; text-decoration:none; color:var(--text); }
 #header-title span { color:var(--accent); }
-#post-btn {
-  pointer-events:auto;
-  background:linear-gradient(135deg, rgba(200,180,255,0.15), rgba(126,207,255,0.1));
-  border:1px solid var(--border); color:var(--accent); font-family:'Syne',sans-serif;
-  font-size:13px; letter-spacing:0.08em; padding:8px 20px; cursor:pointer;
-  transition:all 0.3s; backdrop-filter:blur(8px);
-}
+#header-right { display:flex; gap:8px; pointer-events:auto; }
+#ranking-btn { background:rgba(200,180,255,0.06); border:1px solid var(--border); color:var(--muted); font-family:'Syne',sans-serif; font-size:12px; letter-spacing:0.08em; padding:8px 16px; cursor:pointer; transition:all 0.3s; backdrop-filter:blur(8px); }
+#ranking-btn:hover { background:rgba(200,180,255,0.14); border-color:rgba(200,180,255,0.3); color:var(--accent); }
+#post-btn { background:linear-gradient(135deg,rgba(200,180,255,0.15),rgba(126,207,255,0.1)); border:1px solid var(--border); color:var(--accent); font-family:'Syne',sans-serif; font-size:13px; letter-spacing:0.08em; padding:8px 20px; cursor:pointer; transition:all 0.3s; backdrop-filter:blur(8px); }
 #post-btn:hover { background:rgba(200,180,255,0.25); border-color:rgba(200,180,255,0.4); box-shadow:var(--glow); }
 
 #map { width:100%; height:100%; }
-#map-overlay { position:absolute; inset:0; pointer-events:none; z-index:1; background:radial-gradient(ellipse at center, transparent 40%, rgba(6,5,15,0.5) 100%); }
+#map-overlay { position:absolute; inset:0; pointer-events:none; z-index:1; background:radial-gradient(ellipse at center,transparent 40%,rgba(6,5,15,0.5) 100%); }
 
-/* サイドパネル */
-#panel {
-  position:fixed; right:0; top:0; bottom:0; width:380px; z-index:50;
-  background:rgba(10,8,24,0.97); backdrop-filter:blur(20px);
-  border-left:1px solid var(--border);
-  transform:translateX(100%); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);
-  display:flex; flex-direction:column; overflow:hidden;
-}
+/* Panel */
+#panel { position:fixed; right:0; top:0; bottom:0; width:380px; z-index:50; background:rgba(10,8,24,0.97); backdrop-filter:blur(20px); border-left:1px solid var(--border); transform:translateX(100%); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1); display:flex; flex-direction:column; overflow:hidden; }
 #panel.open { transform:translateX(0); }
-#panel-header {
-  padding:80px 14px 16px; border-bottom:1px solid var(--border);
-  display:flex; align-items:center; gap:10px; flex-shrink:0;
-}
-#panel-place-name {
-    text-align: center;
-  font-size:14px; font-weight:400; line-height:1.4; color:var(--accent);
-  flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-}
-
-/* 地図に戻るボタン */
-#back-to-map-btn {
-  display:flex; align-items:center; gap:5px;
-  background:rgba(200,180,255,0.06); border:1px solid var(--border);
-  color:var(--muted); font-family:'Syne',sans-serif;
-  font-size:11px; letter-spacing:0.05em; padding:6px 10px;
-  cursor:pointer; transition:all 0.2s; flex-shrink:0; white-space:nowrap;
-}
+#panel-header { padding:70px 14px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; flex-shrink:0; }
+#back-to-map-btn { display:flex; align-items:center; gap:5px; background:rgba(200,180,255,0.06); border:1px solid var(--border); color:var(--muted); font-family:'Syne',sans-serif; font-size:11px; letter-spacing:0.05em; padding:6px 10px; cursor:pointer; transition:all 0.2s; flex-shrink:0; white-space:nowrap; }
 #back-to-map-btn:hover { background:rgba(200,180,255,0.14); color:var(--accent); border-color:rgba(200,180,255,0.35); }
-
-#panel-close {
-  background:none; border:none; color:var(--muted); cursor:pointer;
-  font-size:18px; line-height:1; padding:4px; transition:color 0.2s; flex-shrink:0;
-}
+#panel-place-name { font-size:13px; color:var(--accent); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center; }
+#panel-close { background:none; border:none; color:var(--muted); cursor:pointer; font-size:18px; padding:4px; transition:color 0.2s; flex-shrink:0; }
 #panel-close:hover { color:var(--accent); }
-
-/* SP: パネルを下から全画面 */
-@media (max-width:640px) {
-  #panel {
-    width:100%; left:0; right:0;
-    transform:translateY(100%);
-    border-left:none; border-top:1px solid var(--border);
-  }
-  #panel.open { transform:translateY(0); }
-  #post-btn { font-size:12px; padding:7px 14px; }
-}
 #panel-posts { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:12px; }
 #panel-posts::-webkit-scrollbar { width:4px; }
 #panel-posts::-webkit-scrollbar-thumb { background:rgba(200,180,255,0.2); border-radius:2px; }
+#panel-add-btn { margin:12px; padding:12px; background:rgba(200,180,255,0.06); border:1px dashed rgba(200,180,255,0.2); color:var(--muted); font-family:'Syne',sans-serif; font-size:13px; letter-spacing:0.06em; cursor:pointer; transition:all 0.2s; flex-shrink:0; }
+#panel-add-btn:hover { background:rgba(200,180,255,0.1); color:var(--accent); border-color:rgba(200,180,255,0.4); }
 
-.post-card {
-  border:1px solid var(--border); border-radius:4px;
-  background:rgba(255,255,255,0.02); transition:all 0.2s; cursor:pointer;
+@media (max-width:640px) {
+  #panel { width:100%; left:0; right:0; transform:translateY(100%); border-left:none; border-top:1px solid var(--border); }
+  #panel.open { transform:translateY(0); }
+  #panel-header { padding:58px 14px 14px; }
+  #post-btn { font-size:12px; padding:7px 14px; }
+  #ranking-btn { font-size:11px; padding:7px 10px; }
 }
+
+/* Post cards */
+.post-card { border:1px solid var(--border); border-radius:4px; background:rgba(255,255,255,0.02); transition:all 0.2s; cursor:pointer; overflow:hidden; }
 .post-card:hover { border-color:rgba(200,180,255,0.4); background:rgba(200,180,255,0.04); transform:translateY(-1px); }
 .post-img { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; }
 .post-img-placeholder { width:100%; aspect-ratio:16/9; background:rgba(200,180,255,0.05); display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:12px; }
 .post-body { padding:12px; }
 .post-comment { font-family:'Noto Serif JP',serif; font-size:13px; line-height:1.7; color:rgba(232,224,255,0.85); }
-.post-meta { display:flex; justify-content:space-between; align-items:center; margin-top:10px; gap:8px; flex-wrap:wrap; }
+.post-meta { display:flex; align-items:center; margin-top:10px; gap:6px; flex-wrap:wrap; }
 .post-time { font-size:11px; color:var(--muted); }
 .post-img-count { font-size:11px; color:var(--accent2); }
-.report-btn { background:none; border:none; color:var(--muted); font-size:11px; cursor:pointer; font-family:'Syne',sans-serif; letter-spacing:0.05em; transition:color 0.2s; padding:4px; margin-left:auto; }
+.post-fav-count { font-size:11px; color:var(--heart); }
+.report-btn { background:none; border:none; color:var(--muted); font-size:11px; cursor:pointer; font-family:'Syne',sans-serif; transition:color 0.2s; padding:4px; margin-left:auto; }
 .report-btn:hover { color:var(--danger); }
 
-#panel-add-btn { margin:12px; padding:12px; background:rgba(200,180,255,0.06); border:1px dashed rgba(200,180,255,0.2); color:var(--muted); font-family:'Syne',sans-serif; font-size:13px; letter-spacing:0.06em; cursor:pointer; transition:all 0.2s; flex-shrink:0; }
-#panel-add-btn:hover { background:rgba(200,180,255,0.1); color:var(--accent); border-color:rgba(200,180,255,0.4); }
+/* Ranking modal */
+#ranking-overlay { position:fixed; inset:0; z-index:150; background:rgba(6,5,15,0.88); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+#ranking-overlay.open { opacity:1; pointer-events:auto; }
+#ranking-modal { width:560px; max-width:calc(100vw - 32px); max-height:88vh; background:var(--surface); border:1px solid rgba(200,180,255,0.2); display:flex; flex-direction:column; transform:translateY(16px); transition:transform 0.3s; }
+#ranking-overlay.open #ranking-modal { transform:translateY(0); }
+#ranking-top { padding:20px 20px 0; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+#ranking-top h2 { font-size:14px; letter-spacing:0.1em; color:var(--accent); font-weight:400; }
+#ranking-close { background:none; border:none; color:var(--muted); cursor:pointer; font-size:20px; padding:2px; transition:color 0.2s; }
+#ranking-close:hover { color:var(--accent); }
+#ranking-tabs { display:flex; border-bottom:1px solid var(--border); margin:14px 20px 0; flex-shrink:0; }
+.rtab { padding:10px 18px; font-size:12px; letter-spacing:0.06em; color:var(--muted); background:none; border:none; border-bottom:2px solid transparent; cursor:pointer; font-family:'Syne',sans-serif; transition:all 0.2s; }
+.rtab:hover { color:var(--text); }
+.rtab.active { color:var(--accent); border-bottom-color:var(--accent); }
+#ranking-list { flex:1; overflow-y:auto; padding:14px 20px 20px; display:flex; flex-direction:column; gap:10px; }
+#ranking-list::-webkit-scrollbar { width:4px; }
+#ranking-list::-webkit-scrollbar-thumb { background:rgba(200,180,255,0.2); border-radius:2px; }
+.rank-card { display:grid; grid-template-columns:36px 84px 1fr; gap:12px; align-items:center; border:1px solid var(--border); padding:10px 12px; cursor:pointer; background:rgba(255,255,255,0.02); transition:all 0.2s; border-radius:2px; }
+.rank-card:hover { border-color:rgba(200,180,255,0.35); background:rgba(200,180,255,0.04); }
+.rank-num { font-size:20px; font-weight:700; color:var(--muted); text-align:center; line-height:1; }
+.rank-num.top1 { color:#ffd700; } .rank-num.top2 { color:#c0c0c0; } .rank-num.top3 { color:#cd7f32; }
+.rank-thumb { width:84px; aspect-ratio:4/3; object-fit:cover; display:block; background:rgba(200,180,255,0.05); }
+.rank-info { min-width:0; }
+.rank-place { font-size:11px; color:var(--accent2); letter-spacing:0.06em; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.rank-comment { font-family:'Noto Serif JP',serif; font-size:12px; color:var(--text); line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.rank-meta { font-size:11px; color:var(--muted); margin-top:5px; display:flex; gap:8px; }
+.rank-fav { color:var(--heart); }
 
-/* 投稿モーダル */
-#modal-overlay {
-  position:fixed; inset:0; z-index:200;
-  background:rgba(6,5,15,0.85); backdrop-filter:blur(6px);
-  display:flex; align-items:center; justify-content:center;
-  opacity:0; pointer-events:none; transition:opacity 0.3s;
-}
+/* Post modal */
+#modal-overlay { position:fixed; inset:0; z-index:200; background:rgba(6,5,15,0.85); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.3s; }
 #modal-overlay.open { opacity:1; pointer-events:auto; }
-#modal {
-  width:480px; max-width:calc(100vw - 40px); max-height:90vh; overflow-y:auto;
-  background:var(--surface); border:1px solid rgba(200,180,255,0.2);
-  padding:28px; position:relative;
-  transform:translateY(20px); transition:transform 0.3s;
-}
+#modal { width:480px; max-width:calc(100vw - 40px); max-height:90vh; overflow-y:auto; background:var(--surface); border:1px solid rgba(200,180,255,0.2); padding:28px; position:relative; transform:translateY(20px); transition:transform 0.3s; }
 #modal::-webkit-scrollbar { width:3px; }
 #modal-overlay.open #modal { transform:translateY(0); }
 #modal h2 { font-size:15px; letter-spacing:0.1em; font-weight:400; color:var(--accent); margin-bottom:24px; }
 .field { margin-bottom:18px; }
 .field label { display:block; font-size:11px; letter-spacing:0.1em; color:var(--muted); margin-bottom:8px; }
-
 #place-search-wrap { position:relative; }
 #place-search { width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--border); color:var(--text); font-family:'Syne',sans-serif; font-size:14px; padding:10px 14px; outline:none; transition:border-color 0.2s; }
 #place-search:focus { border-color:rgba(200,180,255,0.5); }
@@ -144,43 +113,23 @@ html, body { height:100%; overflow:hidden; font-family:'Syne', sans-serif; backg
 .place-result-item small { color:var(--muted); font-size:11px; display:block; margin-top:2px; }
 #selected-place { padding:8px 12px; background:rgba(200,180,255,0.08); border:1px solid rgba(200,180,255,0.2); font-size:13px; color:var(--accent); display:none; margin-top:6px; }
 #selected-place.show { display:block; }
-
-/* 画像アップロード */
 #img-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px; }
-.img-slot {
-  aspect-ratio:1; border:1px dashed rgba(200,180,255,0.2); border-radius:4px;
-  display:flex; align-items:center; justify-content:center;
-  background:rgba(255,255,255,0.02); cursor:pointer; position:relative; overflow:hidden;
-  transition:all 0.2s;
-}
+.img-slot { aspect-ratio:1; border:1px dashed rgba(200,180,255,0.2); border-radius:4px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.02); cursor:pointer; position:relative; overflow:hidden; transition:all 0.2s; }
 .img-slot:hover { border-color:rgba(200,180,255,0.5); background:rgba(200,180,255,0.06); }
 .img-slot.filled { border-style:solid; border-color:rgba(200,180,255,0.3); cursor:default; }
 .img-slot svg { opacity:0.3; }
 .img-slot img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-.img-slot .remove-btn {
-  position:absolute; top:4px; right:4px; width:22px; height:22px; border-radius:50%;
-  background:rgba(6,5,15,0.88); border:1px solid rgba(255,107,138,0.6);
-  color:var(--danger); font-size:12px; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-  transition:all 0.15s; z-index:2;
-}
+.img-slot .remove-btn { position:absolute; top:4px; right:4px; width:22px; height:22px; border-radius:50%; background:rgba(6,5,15,0.88); border:1px solid rgba(255,107,138,0.6); color:var(--danger); font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; z-index:2; }
 .img-slot .remove-btn:hover { background:rgba(255,107,138,0.25); }
-#img-add-btn {
-  display:none; align-items:center; justify-content:center; gap:6px;
-  padding:9px; background:rgba(200,180,255,0.04);
-  border:1px dashed rgba(200,180,255,0.15); color:var(--muted);
-  font-family:'Syne',sans-serif; font-size:12px; letter-spacing:0.05em;
-  cursor:pointer; transition:all 0.2s; position:relative; width:100%;
-}
+#img-add-btn { display:none; align-items:center; justify-content:center; gap:6px; padding:9px; background:rgba(200,180,255,0.04); border:1px dashed rgba(200,180,255,0.15); color:var(--muted); font-family:'Syne',sans-serif; font-size:12px; letter-spacing:0.05em; cursor:pointer; transition:all 0.2s; position:relative; width:100%; }
 #img-add-btn:hover { background:rgba(200,180,255,0.08); border-color:rgba(200,180,255,0.3); color:var(--accent); }
 #img-add-btn input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
-
 #comment-input { width:100%; height:80px; resize:none; background:rgba(255,255,255,0.04); border:1px solid var(--border); color:var(--text); font-family:'Noto Serif JP',serif; font-size:13px; padding:10px 14px; outline:none; transition:border-color 0.2s; line-height:1.6; }
 #comment-input:focus { border-color:rgba(200,180,255,0.5); }
 #char-count { text-align:right; font-size:11px; color:var(--muted); margin-top:4px; }
 #char-count.over { color:var(--danger); }
 #modal-actions { display:flex; gap:10px; margin-top:6px; }
-#submit-btn { flex:1; padding:12px; background:linear-gradient(135deg, rgba(200,180,255,0.2), rgba(126,207,255,0.1)); border:1px solid rgba(200,180,255,0.3); color:var(--accent); font-family:'Syne',sans-serif; font-size:13px; letter-spacing:0.08em; cursor:pointer; transition:all 0.2s; }
+#submit-btn { flex:1; padding:12px; background:linear-gradient(135deg,rgba(200,180,255,0.2),rgba(126,207,255,0.1)); border:1px solid rgba(200,180,255,0.3); color:var(--accent); font-family:'Syne',sans-serif; font-size:13px; letter-spacing:0.08em; cursor:pointer; transition:all 0.2s; }
 #submit-btn:hover:not(:disabled) { background:rgba(200,180,255,0.3); }
 #submit-btn:disabled { opacity:0.4; cursor:not-allowed; }
 #cancel-btn { padding:12px 20px; background:none; border:1px solid var(--border); color:var(--muted); font-family:'Syne',sans-serif; font-size:13px; cursor:pointer; transition:all 0.2s; }
@@ -191,86 +140,53 @@ html, body { height:100%; overflow:hidden; font-family:'Syne', sans-serif; backg
 #modal-close { position:absolute; top:16px; right:16px; background:none; border:none; color:var(--muted); cursor:pointer; font-size:18px; }
 #modal-close:hover { color:var(--accent); }
 
-/* 投稿詳細モーダル */
-
-@media (max-width:640px) {
-    #panel-header {
-        padding: 65px 14px 16px;
-    }
-}
-#detail-overlay {
-  position:fixed; inset:0; z-index:250;
-  background:rgba(6,5,15,0.92); backdrop-filter:blur(8px);
-  display:flex; align-items:center; justify-content:center;
-  opacity:0; pointer-events:none; transition:opacity 0.3s;
-}
+/* Detail modal */
+#detail-overlay { position:fixed; inset:0; z-index:250; background:rgba(6,5,15,0.92); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.3s; }
 #detail-overlay.open { opacity:1; pointer-events:auto; }
-#detail-modal {
-  width:580px; max-width:calc(100vw - 40px); max-height:90vh;
-  background:var(--surface); border:1px solid rgba(200,180,255,0.2);
-  position:relative; overflow:hidden; display:flex; flex-direction:column;
-  transform:translateY(20px) scale(0.98); transition:transform 0.3s;
-}
+#detail-modal { width:580px; max-width:calc(100vw - 40px); max-height:90vh; background:var(--surface); border:1px solid rgba(200,180,255,0.2); position:relative; overflow:hidden; display:flex; flex-direction:column; transform:translateY(20px) scale(0.98); transition:transform 0.3s; }
 #detail-overlay.open #detail-modal { transform:translateY(0) scale(1); }
-#detail-close {
-  position:absolute; top:12px; right:12px; z-index:10;
-  background:rgba(6,5,15,0.8); border:1px solid var(--border);
-  color:var(--muted); cursor:pointer; font-size:14px;
-  width:30px; height:30px; display:flex; align-items:center; justify-content:center;
-  transition:all 0.2s; border-radius:2px;
-}
+#detail-close { position:absolute; top:12px; right:12px; z-index:10; background:rgba(6,5,15,0.8); border:1px solid var(--border); color:var(--muted); cursor:pointer; font-size:14px; width:30px; height:30px; display:flex; align-items:center; justify-content:center; transition:all 0.2s; border-radius:2px; }
 #detail-close:hover { color:var(--accent); border-color:rgba(200,180,255,0.4); }
-
-/* シェアボタン */
-#detail-share-btn {
-  background:none;
-  border:1px solid var(--border);
-  color:var(--muted);
-  font-size:11px;
-  padding:4px 8px;
-  cursor:pointer;
-  transition:all 0.2s;
-}
-
-#detail-share-btn:hover {
-  color:var(--accent);
-  border-color:rgba(200,180,255,0.4);
-}
-
-/* 画像スライダー */
 #detail-img-wrap { position:relative; width:100%; aspect-ratio:16/9; background:#060420; flex-shrink:0; overflow:hidden; }
 #detail-img-wrap img { width:100%; height:100%; object-fit:cover; display:block; transition:opacity 0.2s; }
 #detail-no-img { width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:13px; }
-.slider-btn {
-  position:absolute; top:50%; transform:translateY(-50%);
-  background:rgba(6,5,15,0.7); border:1px solid rgba(200,180,255,0.2);
-  color:var(--text); width:36px; height:36px; cursor:pointer;
-  display:flex; align-items:center; justify-content:center; font-size:20px;
-  transition:all 0.2s; z-index:5; border-radius:2px;
-}
+.slider-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(6,5,15,0.7); border:1px solid rgba(200,180,255,0.2); color:var(--text); width:36px; height:36px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; transition:all 0.2s; z-index:5; border-radius:2px; }
 .slider-btn:hover { background:rgba(200,180,255,0.15); border-color:rgba(200,180,255,0.5); }
 #slider-prev { left:10px; }
 #slider-next { right:10px; }
 #slider-dots { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:6px; }
 .slider-dot { width:6px; height:6px; border-radius:50%; background:rgba(200,180,255,0.3); transition:all 0.2s; cursor:pointer; border:none; }
 .slider-dot.active { background:var(--accent); transform:scale(1.3); }
-
 #detail-body { padding:20px 24px; overflow-y:auto; }
 #detail-body::-webkit-scrollbar { width:3px; }
 #detail-place { font-size:12px; letter-spacing:0.08em; color:var(--accent2); margin-bottom:10px; }
 #detail-comment { font-family:'Noto Serif JP',serif; font-size:15px; line-height:1.85; color:var(--text); }
 #detail-footer { display:flex; justify-content:space-between; align-items:center; margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
 #detail-time { font-size:11px; color:var(--muted); }
-#detail-report-btn { background:none; border:none; color:var(--muted); font-size:11px; cursor:pointer; font-family:'Syne',sans-serif; transition:color 0.2s; padding:4px; }
+#detail-actions { display:flex; gap:8px; align-items:center; }
+#detail-fav-btn { display:flex; align-items:center; gap:5px; background:none; border:1px solid var(--border); color:var(--muted); font-family:'Syne',sans-serif; font-size:11px; padding:5px 10px; cursor:pointer; transition:all 0.2s; }
+#detail-fav-btn:hover { border-color:rgba(255,107,138,0.4); color:var(--heart); }
+#detail-fav-btn.active { border-color:rgba(255,107,138,0.5); color:var(--heart); background:rgba(255,107,138,0.08); }
+#detail-fav-btn svg { transition:transform 0.15s; }
+#detail-fav-btn.active svg { transform:scale(1.2); }
+#detail-share-btn { background:none; border:1px solid var(--border); color:var(--muted); font-size:11px; padding:5px 10px; cursor:pointer; transition:all 0.2s; font-family:'Syne',sans-serif; letter-spacing:0.04em; }
+#detail-share-btn:hover { color:var(--accent); border-color:rgba(200,180,255,0.4); }
+#detail-report-btn { background:none; border:none; color:var(--muted); font-size:11px; cursor:pointer; font-family:'Syne',sans-serif; transition:color 0.2s; padding:5px; }
 #detail-report-btn:hover { color:var(--danger); }
 
-/* 通報モーダル */
-#report-modal-overlay {
-  position:fixed; inset:0; z-index:350;
-  background:rgba(6,5,15,0.9); backdrop-filter:blur(4px);
-  display:flex; align-items:center; justify-content:center;
-  opacity:0; pointer-events:none; transition:opacity 0.2s;
-}
+/* Share modal */
+#share-overlay { position:fixed; inset:0; z-index:320; background:rgba(6,5,15,0.88); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.2s; }
+#share-overlay.open { opacity:1; pointer-events:auto; }
+#share-modal { width:300px; background:var(--surface); border:1px solid rgba(200,180,255,0.2); padding:24px; transform:translateY(10px); transition:transform 0.2s; }
+#share-overlay.open #share-modal { transform:translateY(0); }
+#share-modal h3 { font-size:13px; letter-spacing:0.1em; color:var(--accent); margin-bottom:16px; font-weight:400; }
+.share-btn { width:100%; padding:10px 14px; margin-bottom:8px; background:rgba(200,180,255,0.05); border:1px solid var(--border); color:var(--text); font-family:'Syne',sans-serif; font-size:13px; cursor:pointer; text-align:left; transition:all 0.2s; letter-spacing:0.04em; }
+.share-btn:hover { background:rgba(200,180,255,0.1); border-color:rgba(200,180,255,0.3); }
+#share-cancel { background:none; border:none; color:var(--muted); font-size:12px; cursor:pointer; margin-top:6px; font-family:'Syne',sans-serif; width:100%; text-align:center; padding:6px; }
+#share-cancel:hover { color:var(--text); }
+
+/* Report modal */
+#report-modal-overlay { position:fixed; inset:0; z-index:350; background:rgba(6,5,15,0.9); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.2s; }
 #report-modal-overlay.open { opacity:1; pointer-events:auto; }
 #report-modal { width:320px; background:var(--surface); border:1px solid rgba(255,107,138,0.3); padding:24px; transform:translateY(10px); transition:transform 0.2s; }
 #report-modal-overlay.open #report-modal { transform:translateY(0); }
@@ -279,7 +195,7 @@ html, body { height:100%; overflow:hidden; font-family:'Syne', sans-serif; backg
 .report-reason:hover { background:rgba(255,107,138,0.12); border-color:rgba(255,107,138,0.4); }
 #report-cancel { background:none; border:none; color:var(--muted); font-size:12px; cursor:pointer; margin-top:8px; font-family:'Syne',sans-serif; }
 
-#toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:rgba(13,11,30,0.95); border:1px solid var(--border); padding:10px 20px; font-size:13px; z-index:500; opacity:0; transition:all 0.3s; pointer-events:none; backdrop-filter:blur(8px); }
+#toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:rgba(13,11,30,0.97); border:1px solid var(--border); padding:10px 20px; font-size:13px; z-index:500; opacity:0; transition:all 0.3s; pointer-events:none; backdrop-filter:blur(8px); white-space:nowrap; }
 #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 #toast.err { border-color:rgba(255,107,138,0.4); color:var(--danger); }
 #toast.ok { border-color:rgba(126,255,160,0.3); color:#7effa0; }
@@ -302,7 +218,10 @@ html, body { height:100%; overflow:hidden; font-family:'Syne', sans-serif; backg
 
 <div id="header">
   <a href="/" id="header-title">DREAM<span>CORE</span> MAP</a>
-  <button id="post-btn" onclick="openModal()">+ 投稿する</button>
+  <div id="header-right">
+    <button id="ranking-btn" onclick="openRanking()">✦ ランキング</button>
+    <button id="post-btn" onclick="openModal()">+ 投稿する</button>
+  </div>
 </div>
 
 <div id="map"></div>
@@ -311,6 +230,10 @@ html, body { height:100%; overflow:hidden; font-family:'Syne', sans-serif; backg
 <!-- サイドパネル -->
 <div id="panel">
   <div id="panel-header">
+    <button id="back-to-map-btn" onclick="closePanel()">
+      <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      地図に戻る
+    </button>
     <div id="panel-place-name"></div>
     <button id="panel-close" onclick="closePanel()">✕</button>
   </div>
@@ -318,12 +241,26 @@ html, body { height:100%; overflow:hidden; font-family:'Syne', sans-serif; backg
   <button id="panel-add-btn" onclick="openModalForPlace()">この場所に投稿する</button>
 </div>
 
+<!-- ランキングモーダル -->
+<div id="ranking-overlay" onclick="handleRankingOverlayClick(event)">
+  <div id="ranking-modal">
+    <div id="ranking-top">
+      <h2>✦ ランキング</h2>
+      <button id="ranking-close" onclick="closeRanking()">✕</button>
+    </div>
+    <div id="ranking-tabs">
+      <button class="rtab active" id="rtab-fav" onclick="switchRankTab('fav',this)">❤ お気に入り TOP 10</button>
+      <button class="rtab" id="rtab-new" onclick="switchRankTab('new',this)">✦ 新着 10件</button>
+    </div>
+    <div id="ranking-list"></div>
+  </div>
+</div>
+
 <!-- 投稿モーダル -->
 <div id="modal-overlay">
   <div id="modal">
     <button id="modal-close" onclick="closeModal()">✕</button>
     <h2>ドリームコアを記録する</h2>
-
     <div class="field">
       <label>施設を検索</label>
       <div id="place-search-wrap">
@@ -332,7 +269,6 @@ html, body { height:100%; overflow:hidden; font-family:'Syne', sans-serif; backg
       </div>
       <div id="selected-place"></div>
     </div>
-
     <div class="field">
       <label>画像（1〜3枚・必須）</label>
       <div id="img-grid">
@@ -348,13 +284,11 @@ html, body { height:100%; overflow:hidden; font-family:'Syne', sans-serif; backg
         <input type="file" id="img-input" accept="image/*">
       </button>
     </div>
-
     <div class="field">
       <label>コメント（最大200文字）</label>
-      <textarea id="comment-input"></textarea>
+      <textarea id="comment-input" placeholder="その場所でどんな夢を見ましたか..."></textarea>
       <div id="char-count">0 / 200</div>
     </div>
-
     <div id="modal-actions">
       <button id="cancel-btn" onclick="closeModal()">キャンセル</button>
       <button id="submit-btn" onclick="submitPost()" disabled>投稿する</button>
@@ -379,12 +313,28 @@ html, body { height:100%; overflow:hidden; font-family:'Syne', sans-serif; backg
       <div id="detail-comment"></div>
       <div id="detail-footer">
         <span id="detail-time"></span>
-        <div style="display:flex; gap:10px;">
+        <div id="detail-actions">
+          <button id="detail-fav-btn" onclick="toggleFavorite()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span id="detail-fav-count">0</span>
+          </button>
           <button id="detail-share-btn" onclick="sharePost()">シェア</button>
           <button id="detail-report-btn" onclick="openReportModalFromDetail()">通報</button>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- シェアモーダル（統一版・1つだけ） -->
+<div id="share-overlay" onclick="handleShareOverlayClick(event)">
+  <div id="share-modal">
+    <h3>この投稿を共有する</h3>
+    <button class="share-btn" onclick="shareToX()">𝕏 &nbsp; Xでシェア</button>
+    <button class="share-btn" onclick="shareToLine()">💬  LINEでシェア</button>
+    <button class="share-btn" onclick="shareToFacebook()">📘  Facebookでシェア</button>
+    <button class="share-btn" onclick="copyShareUrl()">🔗  URLをコピー</button>
+    <button id="share-cancel" onclick="closeShareModal()">閉じる</button>
   </div>
 </div>
 
@@ -401,98 +351,84 @@ html, body { height:100%; overflow:hidden; font-family:'Syne', sans-serif; backg
   </div>
 </div>
 
-<!-- シェアモーダル -->
-<div id="share-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:999; align-items:center; justify-content:center;">
-    <div style="background:#111; padding:20px; width:300px; text-align:center;">
-      <h3 style="margin-bottom:15px;">共有する</h3>
-  
-      <div style="display:flex; flex-direction:column; gap:10px;">
-        <button onclick="copyShareUrl()">URLをコピー</button>
-      </div>
-  
-      <button style="margin-top:15px;" onclick="closeShareModal()">閉じる</button>
-    </div>
-  </div>
-
 <div id="toast"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, collection, addDoc, getDocs, query, orderBy,
-  where, Timestamp, updateDoc, doc, increment, getDoc
+  getFirestore, collection, addDoc, getDocs, getDoc, doc,
+  query, orderBy, where, Timestamp, updateDoc, increment, limit
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-// =============================
-// CONFIG — 自分のFirebaseプロジェクト設定に書き換えてください
-// =============================
+// ===== CONFIG =====
 const FIREBASE_CONFIG = {
-    apiKey: "AIzaSyCrC0lX-x9QncxBAgfIBCPOjD7W1s5k9ig",
+  apiKey: "AIzaSyCrC0lX-x9QncxBAgfIBCPOjD7W1s5k9ig",
   authDomain: "dreamcore-map.firebaseapp.com",
   projectId: "dreamcore-map",
   storageBucket: "dreamcore-map.firebasestorage.app",
   messagingSenderId: "784326416813",
-  appId: "1:784326416813:web:c9f1721cbde26cbbbda924",
-  measurementId: "G-9JRW4TGY1W"
+  appId: "1:784326416813:web:c9f1721cbde26cbbbda924"
 };
 const GOOGLE_MAPS_KEY = "AIzaSyC4M7nqU1hw9trte_zIzMvM1MP3TCl7320";
-const OPENAI_KEY = "YOUR_OPENAI_API_KEY"; // Moderation API用（サーバーサイドでの管理を推奨）
+const OPENAI_KEY = "";
 
-// =============================
 const app = initializeApp(FIREBASE_CONFIG);
 const auth = getAuth(app);
-const db = getFirestore(app);
+const db   = getFirestore(app);
 const storage = getStorage(app);
 
 let map, autocompleteService, placesService;
-let selectedPlace = null;
-let selectedFiles = [];
-let currentPanelPlaceId = null;
-let reportTargetPostId = null;
-let markers = {};
-let currentUserId = null;
-let currentDetailImages = [];
-let currentSlideIndex = 0;
+let selectedPlace = null, selectedFiles = [];
+let currentPanelPlaceId = null, reportTargetPostId = null;
+let markers = {}, currentUserId = null;
+let currentDetailImages = [], currentSlideIndex = 0;
+let currentDetailPostId = null;
+let currentShareUrl = "";
+let myFavorites = new Set();
+let currentRankTab = "fav";
+
+// ===== お気に入りをlocalStorageで永続化 =====
+function loadMyFavs() {
+  try { const r = localStorage.getItem("dcmap_fav"); if (r) myFavorites = new Set(JSON.parse(r)); } catch(e) {}
+}
+function saveMyFavs() {
+  try { localStorage.setItem("dcmap_fav", JSON.stringify([...myFavorites])); } catch(e) {}
+}
 
 // ===== AUTH =====
 async function init() {
+  loadMyFavs();
   try {
     const cred = await signInAnonymously(auth);
     currentUserId = cred.user.uid;
     loadGoogleMaps();
-  } catch(e) {
-    console.error("Auth error:", e);
-    showToast("認証エラーが発生しました", "err");
-    hideLoading();
-  }
+  } catch(e) { showToast("認証エラーが発生しました","err"); hideLoading(); }
 }
 
 // ===== Google Maps =====
 function loadGoogleMaps() {
-  const script = document.createElement("script");
-  script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places&language=ja&region=JP&loading=async&callback=initMap`;
-  script.async = true; script.defer = true;
-  document.head.appendChild(script);
+  const s = document.createElement("script");
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places&language=ja&region=JP&loading=async&callback=initMap`;
+  s.async = true; s.defer = true;
+  document.head.appendChild(s);
 }
 
 window.initMap = async function() {
   map = new google.maps.Map(document.getElementById("map"), {
-    center: { lat: 35.6762, lng: 139.6503 },
-    zoom: 12,
-    disableDefaultUI: false,
-    zoomControl: true, mapTypeControl: false, streetViewControl: false, fullscreenControl: false,
-    styles: [
-      { elementType:"geometry", stylers:[{color:"#0a0818"}] },
-      { elementType:"labels.text.fill", stylers:[{color:"#8b7fc0"}] },
-      { elementType:"labels.text.stroke", stylers:[{color:"#06050f"}] },
-      { featureType:"road", elementType:"geometry", stylers:[{color:"#1a1530"}] },
-      { featureType:"road.highway", elementType:"geometry", stylers:[{color:"#251e40"}] },
-      { featureType:"water", elementType:"geometry", stylers:[{color:"#060420"}] },
-      { featureType:"poi", elementType:"geometry", stylers:[{color:"#0e0c20"}] },
-      { featureType:"poi.park", elementType:"geometry", stylers:[{color:"#0d1220"}] },
-      { featureType:"transit", elementType:"geometry", stylers:[{color:"#12103a"}] }
+    center:{lat:35.6762,lng:139.6503}, zoom:12,
+    zoomControl:true, mapTypeControl:false, streetViewControl:false, fullscreenControl:false,
+    styles:[
+      {elementType:"geometry",stylers:[{color:"#0a0818"}]},
+      {elementType:"labels.text.fill",stylers:[{color:"#8b7fc0"}]},
+      {elementType:"labels.text.stroke",stylers:[{color:"#06050f"}]},
+      {featureType:"road",elementType:"geometry",stylers:[{color:"#1a1530"}]},
+      {featureType:"road.highway",elementType:"geometry",stylers:[{color:"#251e40"}]},
+      {featureType:"water",elementType:"geometry",stylers:[{color:"#060420"}]},
+      {featureType:"poi",elementType:"geometry",stylers:[{color:"#0e0c20"}]},
+      {featureType:"poi.park",elementType:"geometry",stylers:[{color:"#0d1220"}]},
+      {featureType:"transit",elementType:"geometry",stylers:[{color:"#12103a"}]}
     ]
   });
   autocompleteService = new google.maps.places.AutocompleteService();
@@ -502,81 +438,44 @@ window.initMap = async function() {
   hideLoading();
 };
 
-// ===== Load pins =====
+// ===== Pins =====
 async function loadAllPins() {
   try {
-    const q = query(collection(db, "pins"), where("report_count", "<", 3), orderBy("report_count"), orderBy("created_at", "desc"));
+    const q = query(collection(db,"pins"), where("report_count","<",3), orderBy("report_count"), orderBy("created_at","desc"));
     const snap = await getDocs(q);
     const seen = new Set();
     snap.forEach(d => {
       const data = d.data();
-      if (!seen.has(data.place_id)) {
-        seen.add(data.place_id);
-        addMarker(data.place_id, data);
-      }
+      if (!seen.has(data.place_id)) { seen.add(data.place_id); addMarker(data.place_id, data); }
     });
-  } catch(e) { console.warn("loadAllPins error:", e); }
+  } catch(e) { console.warn("loadAllPins:", e); }
 }
 
-// ===== Marker（「D」入りカスタムピン） =====
 function addMarker(placeId, data) {
   if (markers[placeId]) return;
-
-  // SVGピンを作成（「D」の文字入り）
-  const svgPin = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="44" viewBox="0 0 36 44" style="filter:drop-shadow(0 4px 12px rgba(200,180,255,0.5)) drop-shadow(0 0 6px rgba(200,180,255,0.3))">
-      <!-- ピン本体 -->
-      <path d="M18 2C10.268 2 4 8.268 4 16c0 10 14 26 14 26S32 26 32 16C32 8.268 25.732 2 18 2z"
-        fill="#1a1535" stroke="#c8b4ff" stroke-width="1.5"/>
-      <!-- 内側の円 -->
-      <circle cx="18" cy="16" r="9" fill="rgba(200,180,255,0.12)" stroke="rgba(200,180,255,0.4)" stroke-width="1"/>
-      <!-- D の文字 -->
-      <text x="18" y="21" text-anchor="middle" font-family="'Syne', sans-serif" font-size="11" font-weight="700" fill="#c8b4ff" letter-spacing="0">D</text>
-    </svg>`;
-
+  const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="44" viewBox="0 0 36 44" style="filter:drop-shadow(0 4px 12px rgba(200,180,255,0.5))"><path d="M18 2C10.268 2 4 8.268 4 16c0 10 14 26 14 26S32 26 32 16C32 8.268 25.732 2 18 2z" fill="#1a1535" stroke="#c8b4ff" stroke-width="1.5"/><circle cx="18" cy="16" r="9" fill="rgba(200,180,255,0.12)" stroke="rgba(200,180,255,0.4)" stroke-width="1"/><text x="18" y="21" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#c8b4ff">D</text></svg>`;
   const el = document.createElement("div");
-  el.innerHTML = svgPin;
-  el.style.cssText = "cursor:pointer; transform-origin:bottom center; transition:transform 0.2s;";
+  el.innerHTML = svgStr;
+  el.style.cssText = "cursor:pointer;transform-origin:bottom center;transition:transform 0.2s;";
   el.onmouseenter = () => el.style.transform = "scale(1.2)";
   el.onmouseleave = () => el.style.transform = "scale(1)";
-
-  // AdvancedMarkerElementが使える場合はそちら、使えない場合はオーバーレイで代替
+  const clickFn = () => {
+    map.panTo({lat:data.lat,lng:data.lng});
+    if (map.getZoom()<15) map.setZoom(15);
+    setTimeout(() => openPanel(data.place_id, data.place_name), 300);
+  };
   let marker;
   try {
-    marker = new google.maps.marker.AdvancedMarkerElement({
-      map, position: { lat: data.lat, lng: data.lng },
-      content: el, title: data.place_name
-    });
-    marker.addListener("click", () => {
-      map.panTo({ lat: data.lat, lng: data.lng });
-      if (map.getZoom() < 15) map.setZoom(15);
-      setTimeout(() => openPanel(data.place_id, data.place_name), 300);
-    });
+    marker = new google.maps.marker.AdvancedMarkerElement({map, position:{lat:data.lat,lng:data.lng}, content:el, title:data.place_name});
+    marker.addListener("click", clickFn);
   } catch(e) {
-    // フォールバック: 通常Markerを使用
     marker = new google.maps.Marker({
-      map,
-      position: { lat: data.lat, lng: data.lng },
-      title: data.place_name,
-      icon: {
-        url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="44" viewBox="0 0 36 44">
-            <path d="M18 2C10.268 2 4 8.268 4 16c0 10 14 26 14 26S32 26 32 16C32 8.268 25.732 2 18 2z" fill="#1a1535" stroke="#c8b4ff" stroke-width="1.5"/>
-            <circle cx="18" cy="16" r="9" fill="rgba(200,180,255,0.12)" stroke="rgba(200,180,255,0.4)" stroke-width="1"/>
-            <text x="18" y="21" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#c8b4ff">D</text>
-          </svg>`)}`,
-        scaledSize: new google.maps.Size(36, 44),
-        anchor: new google.maps.Point(18, 44),
-      },
-      zIndex: 10
+      map, position:{lat:data.lat,lng:data.lng}, title:data.place_name,
+      icon:{url:`data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svgStr)}`,scaledSize:new google.maps.Size(36,44),anchor:new google.maps.Point(18,44)},
+      zIndex:10
     });
-    marker.addListener("click", () => {
-      map.panTo({ lat: data.lat, lng: data.lng });
-      if (map.getZoom() < 15) map.setZoom(15);
-      setTimeout(() => openPanel(data.place_id, data.place_name), 300);
-    });
+    marker.addListener("click", clickFn);
   }
-
   markers[placeId] = marker;
 }
 
@@ -586,7 +485,7 @@ async function openPanel(placeId, placeName) {
   document.getElementById("panel-place-name").textContent = placeName;
   document.getElementById("panel-posts").innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">読み込み中...</div>';
   document.getElementById("panel").classList.add("open");
-  const q = query(collection(db, "pins"), where("place_id", "==", placeId), orderBy("created_at", "desc"));
+  const q = query(collection(db,"pins"), where("place_id","==",placeId), orderBy("created_at","desc"));
   const snap = await getDocs(q);
   renderPosts(snap);
 }
@@ -597,22 +496,22 @@ function renderPosts(snap) {
   let count = 0;
   snap.forEach(d => {
     const data = d.data();
-    if (data.report_count >= 3) return;
+    if (data.report_count >= 3 || data.admin_hidden) return;
     count++;
     const images = Array.isArray(data.image_urls) ? data.image_urls : (data.image_url ? [data.image_url] : []);
     const firstImg = images[0] || null;
     const timeStr = data.created_at ? new Date(data.created_at.toDate()).toLocaleDateString("ja-JP") : "";
-
+    const favCount = data.favorite_count || 0;
     const card = document.createElement("div");
-    card.className = "post-card";
-    card.dataset.id = d.id;
+    card.className = "post-card"; card.dataset.id = d.id;
     card.innerHTML = `
       ${firstImg ? `<img class="post-img" src="${firstImg}" alt="" loading="lazy">` : `<div class="post-img-placeholder">画像なし</div>`}
       <div class="post-body">
-        <div class="post-comment">${escapeHtml(data.comment)}</div>
+        <div class="post-comment">${esc(data.comment)}</div>
         <div class="post-meta">
           <span class="post-time">${timeStr}</span>
           ${images.length > 1 ? `<span class="post-img-count">📷 ${images.length}枚</span>` : ""}
+          ${favCount > 0 ? `<span class="post-fav-count">❤ ${favCount}</span>` : ""}
           <button class="report-btn" onclick="event.stopPropagation(); openReportModal('${d.id}')">通報</button>
         </div>
       </div>`;
@@ -627,16 +526,80 @@ window.closePanel = function() {
   currentPanelPlaceId = null;
 };
 
-// ===== 投稿詳細モーダル =====
+// ===== Ranking =====
+window.openRanking = async function() {
+  document.getElementById("ranking-overlay").classList.add("open");
+  await loadRankTab(currentRankTab);
+};
+window.closeRanking = function() { document.getElementById("ranking-overlay").classList.remove("open"); };
+window.handleRankingOverlayClick = function(e) { if (e.target === document.getElementById("ranking-overlay")) closeRanking(); };
+
+window.switchRankTab = async function(tab, btn) {
+  currentRankTab = tab;
+  document.querySelectorAll(".rtab").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  await loadRankTab(tab);
+};
+
+async function loadRankTab(tab) {
+  const list = document.getElementById("ranking-list");
+  list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:30px;font-size:13px">読み込み中...</div>';
+  try {
+    let q;
+    if (tab === "fav") {
+      q = query(collection(db,"pins"), where("report_count","<",3), orderBy("report_count"), orderBy("favorite_count","desc"), limit(20));
+    } else {
+      q = query(collection(db,"pins"), where("report_count","<",3), orderBy("report_count"), orderBy("created_at","desc"), limit(10));
+    }
+    const snap = await getDocs(q);
+    list.innerHTML = "";
+    let rank = 0;
+    snap.forEach(d => {
+      const data = d.data();
+      if (data.report_count >= 3 || data.admin_hidden) return;
+      if (rank >= 10) return;
+      rank++;
+      const images = Array.isArray(data.image_urls) ? data.image_urls : (data.image_url ? [data.image_url] : []);
+      const firstImg = images[0] || null;
+      const timeStr = data.created_at ? new Date(data.created_at.toDate()).toLocaleDateString("ja-JP") : "";
+      const favCount = data.favorite_count || 0;
+      const numCls = rank===1?"top1":rank===2?"top2":rank===3?"top3":"";
+      const card = document.createElement("div");
+      card.className = "rank-card";
+      card.innerHTML = `
+        <div class="rank-num ${numCls}">${rank}</div>
+        ${firstImg ? `<img class="rank-thumb" src="${firstImg}" alt="" loading="lazy">` : `<div class="rank-thumb" style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:10px">画像なし</div>`}
+        <div class="rank-info">
+          <div class="rank-place">${esc(data.place_name||"")}</div>
+          <div class="rank-comment">${esc(data.comment||"")}</div>
+          <div class="rank-meta">
+            <span class="rank-fav">❤ ${favCount}</span>
+            <span>${timeStr}</span>
+          </div>
+        </div>`;
+      card.onclick = () => { closeRanking(); openDetailModal(data, d.id); };
+      list.appendChild(card);
+    });
+    if (rank === 0) list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:30px;font-size:13px">まだ投稿がありません</div>';
+  } catch(e) {
+    console.warn("loadRankTab error:", e);
+    list.innerHTML = `<div style="text-align:center;color:var(--muted);padding:30px;font-size:13px">読み込みエラー<br><small>${e.message}</small></div>`;
+  }
+}
+
+// ===== Detail Modal =====
 window.openDetailModal = function(data, postId) {
   const images = Array.isArray(data.image_urls) ? data.image_urls : (data.image_url ? [data.image_url] : []);
-  currentDetailImages = images;
-  currentSlideIndex = 0;
-  reportTargetPostId = postId;
+  currentDetailImages = images; currentSlideIndex = 0;
+  currentDetailPostId = postId; reportTargetPostId = postId;
   document.getElementById("detail-place").textContent = data.place_name || "";
   document.getElementById("detail-comment").textContent = data.comment || "";
-  const timeStr = data.created_at ? new Date(data.created_at.toDate()).toLocaleDateString("ja-JP") : "";
-  document.getElementById("detail-time").textContent = timeStr;
+  document.getElementById("detail-time").textContent = data.created_at ? new Date(data.created_at.toDate()).toLocaleDateString("ja-JP") : "";
+  const isFav = myFavorites.has(postId);
+  const btn = document.getElementById("detail-fav-btn");
+  btn.classList.toggle("active", isFav);
+  btn.querySelector("svg").setAttribute("fill", isFav ? "currentColor" : "none");
+  document.getElementById("detail-fav-count").textContent = data.favorite_count || 0;
   updateSlider();
   document.getElementById("detail-overlay").classList.add("open");
 };
@@ -647,342 +610,244 @@ function updateSlider() {
   const prev = document.getElementById("slider-prev");
   const next = document.getElementById("slider-next");
   const dots = document.getElementById("slider-dots");
-
-  if (currentDetailImages.length === 0) {
-    img.style.display = "none"; noImg.style.display = "flex";
-    prev.style.display = "none"; next.style.display = "none";
-    dots.innerHTML = ""; return;
+  if (!currentDetailImages.length) {
+    img.style.display="none"; noImg.style.display="flex";
+    prev.style.display="none"; next.style.display="none"; dots.innerHTML=""; return;
   }
-  img.src = currentDetailImages[currentSlideIndex];
-  img.style.display = "block"; noImg.style.display = "none";
+  img.src = currentDetailImages[currentSlideIndex]; img.style.display="block"; noImg.style.display="none";
   const multi = currentDetailImages.length > 1;
-  prev.style.display = multi ? "flex" : "none";
-  next.style.display = multi ? "flex" : "none";
+  prev.style.display = multi?"flex":"none"; next.style.display = multi?"flex":"none";
   dots.innerHTML = "";
-  currentDetailImages.forEach((_, i) => {
+  currentDetailImages.forEach((_,i) => {
     const dot = document.createElement("button");
-    dot.className = "slider-dot" + (i === currentSlideIndex ? " active" : "");
-    dot.onclick = () => { currentSlideIndex = i; updateSlider(); };
+    dot.className = "slider-dot" + (i===currentSlideIndex?" active":"");
+    dot.onclick = () => { currentSlideIndex=i; updateSlider(); };
     dots.appendChild(dot);
   });
 }
 
 window.slideImg = function(dir) {
-  if (!currentDetailImages || currentDetailImages.length === 0) return;
-
-  currentSlideIndex =
-    (currentSlideIndex + dir + currentDetailImages.length) %
-    currentDetailImages.length;
-
+  if (!currentDetailImages.length) return;
+  currentSlideIndex = (currentSlideIndex+dir+currentDetailImages.length)%currentDetailImages.length;
   updateSlider();
 };
 
-document.getElementById("detail-modal").addEventListener("click", e => {
-  e.stopPropagation();
-});
-
+document.getElementById("detail-modal").addEventListener("click", e => e.stopPropagation());
 window.closeDetailModal = function() { document.getElementById("detail-overlay").classList.remove("open"); };
-window.handleDetailOverlayClick = function(e) { if (e.target === document.getElementById("detail-overlay")) closeDetailModal(); };
+window.handleDetailOverlayClick = function(e) { if (e.target===document.getElementById("detail-overlay")) closeDetailModal(); };
 window.openReportModalFromDetail = function() { document.getElementById("report-modal-overlay").classList.add("open"); };
 
+// ===== お気に入り =====
+window.toggleFavorite = async function() {
+  if (!currentDetailPostId) return;
+  const postId = currentDetailPostId;
+  const wasFav = myFavorites.has(postId);
+  const delta = wasFav ? -1 : 1;
+  if (wasFav) myFavorites.delete(postId); else myFavorites.add(postId);
+  saveMyFavs();
+  const btn = document.getElementById("detail-fav-btn");
+  btn.classList.toggle("active", !wasFav);
+  btn.querySelector("svg").setAttribute("fill", !wasFav ? "currentColor" : "none");
+  const cur = parseInt(document.getElementById("detail-fav-count").textContent) || 0;
+  document.getElementById("detail-fav-count").textContent = Math.max(0, cur+delta);
+  try { await updateDoc(doc(db,"pins",postId), {favorite_count: increment(delta)}); }
+  catch(e) { console.warn("fav error:", e); }
+  showToast(!wasFav ? "❤ お気に入りに追加しました" : "お気に入りを解除しました", "ok");
+};
 
-// シェア機能
-function getPostShareUrl(postId) {
-  return `${window.location.origin}${window.location.pathname}?post=${postId}`;
-}
-
-window.sharePost = async function() {
-  if (!reportTargetPostId) return;
-
-  const shareUrl = getPostShareUrl(reportTargetPostId);
-
-  const shareData = {
-    title: "DREAMCORE MAP",
-    text: "夢のような体験を見つけました",
-    url: shareUrl
-  };
-
-  // Web Share API
-  if (navigator.share && navigator.canShare?.(shareData)) {
-    try {
-      await navigator.share(shareData);
-      return;
-    } catch (e) {
-      console.log("share cancelled");
-    }
+// ===== Share（シェアモーダル1本化） =====
+window.sharePost = function() {
+  if (!currentDetailPostId) return;
+  currentShareUrl = `${location.origin}${location.pathname}?post=${currentDetailPostId}`;
+  const sd = {title:"DREAMCORE MAP", text:"夢のような体験を見つけました", url:currentShareUrl};
+  if (navigator.share && navigator.canShare?.(sd)) {
+    navigator.share(sd).catch(()=>{});
+    return;
   }
-
-  openShareModal(shareUrl);
+  document.getElementById("share-overlay").classList.add("open");
 };
-
-let currentShareUrl = "";
-
-function openShareModal(url) {
-  currentShareUrl = url;
-  document.getElementById("share-modal").style.display = "flex";
-}
-
-window.closeShareModal = function() {
-  document.getElementById("share-modal").style.display = "none";
-};
-
-// Safari含む完全フォールバック対応
+window.closeShareModal = function() { document.getElementById("share-overlay").classList.remove("open"); };
+window.handleShareOverlayClick = function(e) { if (e.target===document.getElementById("share-overlay")) closeShareModal(); };
+window.shareToX = function() { window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentShareUrl)}&text=${encodeURIComponent("DREAMCORE MAPで見つけた夢の体験")}`, "_blank","noopener"); };
+window.shareToLine = function() { window.open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(currentShareUrl)}`, "_blank","noopener"); };
+window.shareToFacebook = function() { window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentShareUrl)}`, "_blank","noopener"); };
 window.copyShareUrl = async function() {
-  try {
-    await navigator.clipboard.writeText(currentShareUrl);
-  } catch (e) {
-    const textarea = document.createElement("textarea");
-    textarea.value = currentShareUrl;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand("copy");
-    document.body.removeChild(textarea);
-  }
-  showToast("URLをコピーしました", "ok");
+  try { await navigator.clipboard.writeText(currentShareUrl); }
+  catch(e) { const t=document.createElement("textarea"); t.value=currentShareUrl; document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t); }
+  showToast("URLをコピーしました","ok"); closeShareModal();
 };
 
+// ===== Direct Link =====
 async function handleDirectLink() {
-  const params = new URLSearchParams(window.location.search);
-  const postId = params.get("post");
+  const postId = new URLSearchParams(location.search).get("post");
   if (!postId) return;
-
   try {
-    const snap = await getDoc(doc(db, "pins", postId));
+    const snap = await getDoc(doc(db,"pins",postId));
     if (!snap.exists()) return;
-
     const data = snap.data();
-
-    // マップ移動
-    map.panTo({ lat: data.lat, lng: data.lng });
-    map.setZoom(15);
-
-    // パネル開く
-    setTimeout(() => {
-      openPanel(data.place_id, data.place_name);
-      setTimeout(() => {
-        openDetailModal(data, postId);
-      }, 500);
-    }, 400);
-
-  } catch (e) {
-    console.warn("direct link error", e);
-  }
+    map.panTo({lat:data.lat,lng:data.lng}); map.setZoom(15);
+    setTimeout(() => { openPanel(data.place_id, data.place_name); setTimeout(() => openDetailModal(data, postId), 500); }, 400);
+  } catch(e) { console.warn("direct link:", e); }
 }
 
-
-// ===== 投稿モーダル =====
+// ===== Post Modal =====
 window.openModal = function() {
-  selectedPlace = null; selectedFiles = [];
+  selectedPlace=null; selectedFiles=[];
   document.getElementById("selected-place").classList.remove("show");
-  document.getElementById("place-search").value = "";
-  document.getElementById("comment-input").value = "";
-  document.getElementById("char-count").textContent = "0 / 200";
-  document.getElementById("modal-status").textContent = "";
-  resetImgSlots();
-  validateForm();
+  document.getElementById("place-search").value="";
+  document.getElementById("comment-input").value="";
+  document.getElementById("char-count").textContent="0 / 200";
+  document.getElementById("modal-status").textContent="";
+  resetImgSlots(); validateForm();
   document.getElementById("modal-overlay").classList.add("open");
 };
 window.openModalForPlace = function() { openModal(); };
 window.closeModal = function() { document.getElementById("modal-overlay").classList.remove("open"); };
 
 function resetImgSlots() {
-  for (let i = 0; i < 3; i++) {
-    const slot = document.getElementById(`slot-${i}`);
-    slot.innerHTML = ""; slot.classList.remove("filled");
-    if (i === 0) {
-      slot.style.display = "";
-      slot.innerHTML = `<svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>`;
-      slot.onclick = () => triggerImgInput();
-    } else {
-      slot.style.display = "none"; slot.onclick = null;
-    }
+  for (let i=0;i<3;i++) {
+    const slot=document.getElementById(`slot-${i}`);
+    slot.innerHTML=""; slot.classList.remove("filled");
+    if (i===0) {
+      slot.style.display="";
+      slot.innerHTML=`<svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>`;
+      slot.onclick=()=>triggerImgInput();
+    } else { slot.style.display="none"; slot.onclick=null; }
   }
-  document.getElementById("img-add-btn").style.display = "none";
+  document.getElementById("img-add-btn").style.display="none";
 }
 
 window.triggerImgInput = function() {
-  const input = document.createElement("input");
-  input.type = "file"; input.accept = "image/*";
-  input.onchange = e => { if (e.target.files[0]) handleImageFile(e.target.files[0]); };
+  const input=document.createElement("input"); input.type="file"; input.accept="image/*";
+  input.onchange=e=>{if(e.target.files[0]) handleImageFile(e.target.files[0]);};
   input.click();
 };
-
-document.getElementById("img-input").addEventListener("change", e => {
-  if (e.target.files[0]) handleImageFile(e.target.files[0]);
-  e.target.value = "";
+document.getElementById("img-input").addEventListener("change", e=>{
+  if(e.target.files[0]) handleImageFile(e.target.files[0]); e.target.value="";
 });
 
 function handleImageFile(file) {
-  if (selectedFiles.length >= 3) { showToast("画像は最大3枚です", "err"); return; }
-  if (file.size > 10 * 1024 * 1024) { showToast("画像は10MB以下にしてください", "err"); return; }
-  const idx = selectedFiles.length;
-  selectedFiles.push(file);
-  const reader = new FileReader();
-  reader.onload = e => {
-    const slot = document.getElementById(`slot-${idx}`);
-    slot.style.display = ""; slot.classList.add("filled"); slot.onclick = null;
-    slot.innerHTML = `<img src="${e.target.result}" alt=""><button class="remove-btn" onclick="event.stopPropagation(); removeImage(${idx})">✕</button>`;
-    document.getElementById("img-add-btn").style.display = selectedFiles.length < 3 ? "flex" : "none";
+  if (selectedFiles.length>=3) { showToast("画像は最大3枚です","err"); return; }
+  if (file.size>10*1024*1024) { showToast("画像は10MB以下にしてください","err"); return; }
+  const idx=selectedFiles.length; selectedFiles.push(file);
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const slot=document.getElementById(`slot-${idx}`);
+    slot.style.display=""; slot.classList.add("filled"); slot.onclick=null;
+    slot.innerHTML=`<img src="${e.target.result}" alt=""><button class="remove-btn" onclick="event.stopPropagation(); removeImage(${idx})">✕</button>`;
+    document.getElementById("img-add-btn").style.display=selectedFiles.length<3?"flex":"none";
     validateForm();
   };
   reader.readAsDataURL(file);
 }
 
 window.removeImage = function(idx) {
-  const files = [...selectedFiles];
-  files.splice(idx, 1);
-  selectedFiles = [];
-  resetImgSlots();
-  files.forEach(f => handleImageFile(f));
-  validateForm();
+  const files=[...selectedFiles]; files.splice(idx,1);
+  selectedFiles=[]; resetImgSlots();
+  files.forEach(f=>handleImageFile(f)); validateForm();
 };
 
-// ===== Place Search =====
 let searchTimeout;
-document.getElementById("place-search").addEventListener("input", e => {
+document.getElementById("place-search").addEventListener("input", e=>{
   clearTimeout(searchTimeout);
-  const val = e.target.value.trim();
-  if (val.length < 2) { document.getElementById("place-results").classList.remove("show"); return; }
-  searchTimeout = setTimeout(() => searchPlaces(val), 400);
+  const val=e.target.value.trim();
+  if (val.length<2) { document.getElementById("place-results").classList.remove("show"); return; }
+  searchTimeout=setTimeout(()=>searchPlaces(val),400);
 });
 
 function searchPlaces(q) {
-  autocompleteService.getPlacePredictions({ input: q, componentRestrictions: { country: "jp" }, types: ["establishment"] }, (preds, status) => {
-    const res = document.getElementById("place-results");
-    res.innerHTML = "";
-    if (!preds || status !== google.maps.places.PlacesServiceStatus.OK) { res.classList.remove("show"); return; }
-    preds.slice(0, 5).forEach(p => {
-      const item = document.createElement("div");
-      item.className = "place-result-item";
-      item.innerHTML = `${escapeHtml(p.structured_formatting.main_text)}<small>${escapeHtml(p.structured_formatting.secondary_text || "")}</small>`;
-      item.onclick = () => selectPlace(p.place_id);
-      res.appendChild(item);
+  autocompleteService.getPlacePredictions({input:q,componentRestrictions:{country:"jp"},types:["establishment"]},(preds,status)=>{
+    const res=document.getElementById("place-results"); res.innerHTML="";
+    if (!preds||status!==google.maps.places.PlacesServiceStatus.OK) { res.classList.remove("show"); return; }
+    preds.slice(0,5).forEach(p=>{
+      const item=document.createElement("div"); item.className="place-result-item";
+      item.innerHTML=`${esc(p.structured_formatting.main_text)}<small>${esc(p.structured_formatting.secondary_text||"")}</small>`;
+      item.onclick=()=>selectPlace(p.place_id); res.appendChild(item);
     });
     res.classList.add("show");
   });
 }
 
 function selectPlace(placeId) {
-  placesService.getDetails({ placeId, fields: ["place_id","name","geometry"] }, (place, status) => {
-    if (status !== google.maps.places.PlacesServiceStatus.OK) return;
-    selectedPlace = { place_id: place.place_id, place_name: place.name, lat: place.geometry.location.lat(), lng: place.geometry.location.lng() };
-    document.getElementById("place-search").value = "";
+  placesService.getDetails({placeId,fields:["place_id","name","geometry"]},(place,status)=>{
+    if (status!==google.maps.places.PlacesServiceStatus.OK) return;
+    selectedPlace={place_id:place.place_id,place_name:place.name,lat:place.geometry.location.lat(),lng:place.geometry.location.lng()};
+    document.getElementById("place-search").value="";
     document.getElementById("place-results").classList.remove("show");
-    const sel = document.getElementById("selected-place");
-    sel.textContent = "✓ " + place.name; sel.classList.add("show");
+    const sel=document.getElementById("selected-place"); sel.textContent="✓ "+place.name; sel.classList.add("show");
     validateForm();
   });
 }
 
-// ===== Comment =====
-document.getElementById("comment-input").addEventListener("input", () => {
-  const len = document.getElementById("comment-input").value.length;
-  const cc = document.getElementById("char-count");
-  cc.textContent = `${len} / 200`; cc.className = len > 200 ? "over" : "";
+document.getElementById("comment-input").addEventListener("input",()=>{
+  const len=document.getElementById("comment-input").value.length;
+  const cc=document.getElementById("char-count"); cc.textContent=`${len} / 200`; cc.className=len>200?"over":"";
   validateForm();
 });
 
 function validateForm() {
-  const ok = selectedPlace && selectedFiles.length > 0 && document.getElementById("comment-input").value.length > 0 && document.getElementById("comment-input").value.length <= 200;
-  document.getElementById("submit-btn").disabled = !ok;
+  const ok=selectedPlace&&selectedFiles.length>0&&document.getElementById("comment-input").value.length>0&&document.getElementById("comment-input").value.length<=200;
+  document.getElementById("submit-btn").disabled=!ok;
 }
 
-// ===== Submit =====
 window.submitPost = async function() {
-  if (!selectedPlace || selectedFiles.length === 0) return;
-  const comment = document.getElementById("comment-input").value.trim();
-  setStatus("モデレーション中...", "");
-  document.getElementById("submit-btn").disabled = true;
-
-  const today = new Date(); today.setHours(0,0,0,0);
-  const todayTs = Timestamp.fromDate(today);
-  const countQ = query(collection(db,"pins"), where("user_id","==",currentUserId), where("created_at",">=",todayTs));
-  const countSnap = await getDocs(countQ);
-  if (countSnap.size >= 5) { setStatus("1日の投稿上限（5件）に達しました", "error"); document.getElementById("submit-btn").disabled = false; return; }
-
-  try {
-    const modOk = await moderateText(comment);
-    if (!modOk) { setStatus("テキストがポリシーに違反しています", "error"); document.getElementById("submit-btn").disabled = false; return; }
-  } catch(e) { console.warn("Moderation skip:", e); }
-
-  // 複数画像アップロード
-  const imageUrls = [];
-  for (let i = 0; i < selectedFiles.length; i++) {
-    setStatus(`画像をアップロード中... (${i+1}/${selectedFiles.length})`, "");
-    const file = selectedFiles[i];
-    const ext = file.name.split(".").pop();
-    const storageRef = ref(storage, `pins/${Date.now()}_${i}_${currentUserId}.${ext}`);
-    const snap = await uploadBytes(storageRef, file);
+  if (!selectedPlace||!selectedFiles.length) return;
+  const comment=document.getElementById("comment-input").value.trim();
+  setStatus("確認中...",""); document.getElementById("submit-btn").disabled=true;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const countSnap=await getDocs(query(collection(db,"pins"),where("user_id","==",currentUserId),where("created_at",">=",Timestamp.fromDate(today))));
+  if (countSnap.size>=5) { setStatus("1日の投稿上限（5件）に達しました","error"); document.getElementById("submit-btn").disabled=false; return; }
+  if (OPENAI_KEY) {
+    try {
+      const modOk=await moderateText(comment);
+      if (!modOk) { setStatus("テキストがポリシーに違反しています","error"); document.getElementById("submit-btn").disabled=false; return; }
+    } catch(e) { console.warn("Moderation skip:", e); }
+  }
+  const imageUrls=[];
+  for (let i=0;i<selectedFiles.length;i++) {
+    setStatus(`画像をアップロード中... (${i+1}/${selectedFiles.length})`,"");
+    const file=selectedFiles[i]; const ext=file.name.split(".").pop();
+    const storageRef=ref(storage,`pins/${Date.now()}_${i}_${currentUserId}.${ext}`);
+    const snap=await uploadBytes(storageRef,file);
     imageUrls.push(await getDownloadURL(snap.ref));
   }
-
-  setStatus("投稿を保存中...", "");
-  const docRef = await addDoc(collection(db, "pins"), {
-    place_id: selectedPlace.place_id,
-    place_name: selectedPlace.place_name,
-    lat: selectedPlace.lat, lng: selectedPlace.lng,
-    image_urls: imageUrls,
-    image_url: imageUrls[0] || "",
-    comment,
-    created_at: Timestamp.now(),
-    report_count: 0,
-    user_id: currentUserId
+  setStatus("投稿を保存中...","");
+  await addDoc(collection(db,"pins"),{
+    place_id:selectedPlace.place_id, place_name:selectedPlace.place_name,
+    lat:selectedPlace.lat, lng:selectedPlace.lng,
+    image_urls:imageUrls, image_url:imageUrls[0]||"",
+    comment, created_at:Timestamp.now(),
+    report_count:0, favorite_count:0, user_id:currentUserId
   });
-
-  addMarker(selectedPlace.place_id, { ...selectedPlace, image_urls: imageUrls, image_url: imageUrls[0], report_count: 0 });
-  setStatus("投稿しました！", "ok");
-  setTimeout(() => { closeModal(); openPanel(selectedPlace.place_id, selectedPlace.place_name); }, 1000);
+  addMarker(selectedPlace.place_id,{...selectedPlace,image_urls:imageUrls,image_url:imageUrls[0],report_count:0,favorite_count:0});
+  setStatus("投稿しました！","ok");
+  setTimeout(()=>{closeModal(); openPanel(selectedPlace.place_id,selectedPlace.place_name);},1000);
 };
 
 async function moderateText(text) {
-  if (!OPENAI_KEY) return true;
-  const res = await fetch("https://api.openai.com/v1/moderations", {
-    method: "POST",
-    headers: { "Authorization": `Bearer ${OPENAI_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ input: text })
-  });
-  const data = await res.json();
-  return !data.results?.[0]?.flagged;
+  const res=await fetch("https://api.openai.com/v1/moderations",{method:"POST",headers:{"Authorization":`Bearer ${OPENAI_KEY}`,"Content-Type":"application/json"},body:JSON.stringify({input:text})});
+  return !(await res.json()).results?.[0]?.flagged;
 }
 
-function setStatus(msg, type) { const el = document.getElementById("modal-status"); el.textContent = msg; el.className = type; }
+function setStatus(msg,type){const el=document.getElementById("modal-status");el.textContent=msg;el.className=type;}
 
-// ===== Report =====
-window.openReportModal = function(postId) {
-  reportTargetPostId = postId;
-  document.getElementById("report-modal-overlay").classList.add("open");
-};
-window.closeReportModal = function() { document.getElementById("report-modal-overlay").classList.remove("open"); };
-
-window.submitReport = async function(reason) {
-  if (!reportTargetPostId) return;
-  const postRef = doc(db, "pins", reportTargetPostId);
-  await updateDoc(postRef, { report_count: increment(1) });
-  const updated = await getDoc(postRef);
-  if (updated.data()?.report_count >= 3) {
-    const card = document.querySelector(`.post-card[data-id="${reportTargetPostId}"]`);
-    if (card) card.style.display = "none";
-  }
-  closeReportModal(); closeDetailModal();
-  showToast("通報を受け付けました", "ok");
+window.openReportModal=function(postId){reportTargetPostId=postId;document.getElementById("report-modal-overlay").classList.add("open");};
+window.closeReportModal=function(){document.getElementById("report-modal-overlay").classList.remove("open");};
+window.submitReport=async function(reason){
+  if(!reportTargetPostId) return;
+  const postRef=doc(db,"pins",reportTargetPostId);
+  await updateDoc(postRef,{report_count:increment(1)});
+  const updated=await getDoc(postRef);
+  if(updated.data()?.report_count>=3) document.querySelector(`.post-card[data-id="${reportTargetPostId}"]`)?.remove();
+  closeReportModal(); closeDetailModal(); showToast("通報を受け付けました","ok");
 };
 
-// ===== Utils =====
-window.showToast = function(msg, type = "") {
-  const t = document.getElementById("toast");
-  t.textContent = msg; t.className = `show ${type}`;
-  setTimeout(() => t.className = "", 3000);
+window.showToast=function(msg,type=""){
+  const t=document.getElementById("toast"); t.textContent=msg; t.className=`show ${type}`;
+  setTimeout(()=>t.className="",3000);
 };
-
-function hideLoading() {
-  const l = document.getElementById("loading");
-  l.classList.add("hidden");
-  setTimeout(() => l.style.display = "none", 600);
-}
-
-function escapeHtml(str) {
-  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
-}
+function hideLoading(){const l=document.getElementById("loading");l.classList.add("hidden");setTimeout(()=>l.style.display="none",600);}
+function esc(str){return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
 
 init();
 </script>
