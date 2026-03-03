@@ -20,6 +20,8 @@ html, body { height:100%; overflow:hidden; font-family:'Syne',sans-serif; backgr
 #header-title { font-size:18px; letter-spacing:0.12em; font-weight:300; pointer-events:auto; text-decoration:none; color:var(--text); }
 #header-title span { color:var(--accent); }
 #header-right { display:flex; gap:8px; pointer-events:auto; }
+#help-btn { background:rgba(200,180,255,0.06); border:1px solid var(--border); color:var(--muted); font-family:'Syne',sans-serif; font-size:14px; font-weight:700; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; }
+#help-btn:hover { background:rgba(200,180,255,0.14); border-color:rgba(200,180,255,0.3); color:var(--accent); }
 #ranking-btn { background:rgba(200,180,255,0.06); border:1px solid var(--border); color:var(--muted); font-family:'Syne',sans-serif; font-size:12px; letter-spacing:0.08em; padding:8px 16px; cursor:pointer; transition:all 0.3s; backdrop-filter:blur(8px); }
 #ranking-btn:hover { background:rgba(200,180,255,0.14); border-color:rgba(200,180,255,0.3); color:var(--accent); }
 #post-btn { background:linear-gradient(135deg,rgba(200,180,255,0.15),rgba(126,207,255,0.1)); border:1px solid var(--border); color:var(--accent); font-family:'Syne',sans-serif; font-size:13px; letter-spacing:0.08em; padding:8px 20px; cursor:pointer; transition:all 0.3s; backdrop-filter:blur(8px); }
@@ -169,10 +171,36 @@ html, body { height:100%; overflow:hidden; font-family:'Syne',sans-serif; backgr
 #detail-fav-btn.active { border-color:rgba(255,107,138,0.5); color:var(--heart); background:rgba(255,107,138,0.08); }
 #detail-fav-btn svg { transition:transform 0.15s; }
 #detail-fav-btn.active svg { transform:scale(1.2); }
+#detail-navi-btn { display:flex; align-items:center; gap:4px; background:none; border:1px solid rgba(126,207,255,0.3); color:var(--accent2); font-size:11px; padding:5px 10px; cursor:pointer; transition:all 0.2s; font-family:'Syne',sans-serif; letter-spacing:0.04em; }
+#detail-navi-btn:hover { background:rgba(126,207,255,0.08); border-color:rgba(126,207,255,0.5); }
 #detail-share-btn { background:none; border:1px solid var(--border); color:var(--muted); font-size:11px; padding:5px 10px; cursor:pointer; transition:all 0.2s; font-family:'Syne',sans-serif; letter-spacing:0.04em; }
 #detail-share-btn:hover { color:var(--accent); border-color:rgba(200,180,255,0.4); }
 #detail-report-btn { background:none; border:none; color:var(--muted); font-size:11px; cursor:pointer; font-family:'Syne',sans-serif; transition:color 0.2s; padding:5px; }
 #detail-report-btn:hover { color:var(--danger); }
+
+/* Help modal */
+#help-overlay { position:fixed; inset:0; z-index:400; background:rgba(6,5,15,0.94); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.4s; }
+#help-overlay.open { opacity:1; pointer-events:auto; }
+#help-modal { width:440px; max-width:calc(100vw - 32px); max-height:90vh; overflow-y:auto; background:var(--surface); border:1px solid rgba(200,180,255,0.25); padding:32px 28px 24px; position:relative; transform:translateY(20px); transition:transform 0.4s; }
+#help-overlay.open #help-modal { transform:translateY(0); }
+#help-close { position:absolute; top:14px; right:14px; background:none; border:none; color:var(--muted); cursor:pointer; font-size:18px; transition:color 0.2s; }
+#help-close:hover { color:var(--accent); }
+#help-header { text-align:center; margin-bottom:28px; }
+#help-logo { font-size:20px; letter-spacing:0.14em; font-weight:300; color:var(--text); margin-bottom:8px; }
+#help-logo span { color:var(--accent); }
+#help-sub { font-size:12px; color:var(--muted); letter-spacing:0.08em; }
+#help-steps { display:flex; flex-direction:column; gap:16px; margin-bottom:28px; }
+.help-step { display:flex; gap:14px; align-items:flex-start; }
+.help-step-num { font-size:11px; letter-spacing:0.1em; color:var(--accent); background:rgba(200,180,255,0.08); border:1px solid rgba(200,180,255,0.2); padding:3px 8px; flex-shrink:0; margin-top:2px; font-weight:700; }
+.help-step-body { flex:1; }
+.help-step-title { font-size:13px; color:var(--text); margin-bottom:4px; letter-spacing:0.04em; }
+.help-step-desc { font-size:12px; color:var(--muted); line-height:1.7; font-family:'Noto Serif JP',serif; }
+.help-pin { display:inline-flex; align-items:center; justify-content:center; background:rgba(200,180,255,0.15); border:1px solid rgba(200,180,255,0.3); color:var(--accent); font-size:11px; font-weight:700; width:20px; height:20px; border-radius:50%; font-family:'Syne',sans-serif; }
+#help-start-btn { width:100%; padding:13px; background:linear-gradient(135deg,rgba(200,180,255,0.2),rgba(126,207,255,0.1)); border:1px solid rgba(200,180,255,0.35); color:var(--accent); font-family:'Syne',sans-serif; font-size:13px; letter-spacing:0.1em; cursor:pointer; transition:all 0.2s; margin-bottom:14px; }
+#help-start-btn:hover { background:rgba(200,180,255,0.3); }
+#help-dont-show { text-align:center; }
+#help-dont-show label { font-size:11px; color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
+#help-dont-show input { accent-color:var(--accent); cursor:pointer; }
 
 /* Share modal */
 #share-overlay { position:fixed; inset:0; z-index:320; background:rgba(6,5,15,0.88); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.2s; }
@@ -219,6 +247,7 @@ html, body { height:100%; overflow:hidden; font-family:'Syne',sans-serif; backgr
 <div id="header">
   <a href="/" id="header-title">DREAM<span>CORE</span> MAP</a>
   <div id="header-right">
+    <button id="help-btn" onclick="openHelp()" title="使い方">？</button>
     <button id="ranking-btn" onclick="openRanking()">✦ ランキング</button>
     <button id="post-btn" onclick="openModal()">+ 投稿する</button>
   </div>
@@ -318,10 +347,59 @@ html, body { height:100%; overflow:hidden; font-family:'Syne',sans-serif; backgr
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             <span id="detail-fav-count">0</span>
           </button>
+          <button id="detail-navi-btn" onclick="openNavigation()">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            経路
+          </button>
           <button id="detail-share-btn" onclick="sharePost()">シェア</button>
           <button id="detail-report-btn" onclick="openReportModalFromDetail()">通報</button>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- 使い方モーダル -->
+<div id="help-overlay" onclick="handleHelpOverlayClick(event)">
+  <div id="help-modal">
+    <button id="help-close" onclick="closeHelp()">✕</button>
+    <div id="help-header">
+      <div id="help-logo">DREAM<span>CORE</span> MAP</div>
+      <p id="help-sub">夢のような場所を、地図に残す</p>
+    </div>
+    <div id="help-steps">
+      <div class="help-step">
+        <div class="help-step-num">01</div>
+        <div class="help-step-body">
+          <div class="help-step-title">地図を探索する</div>
+          <div class="help-step-desc">地図上の <span class="help-pin">D</span> ピンをタップすると、その場所に投稿された写真や体験が見られます。</div>
+        </div>
+      </div>
+      <div class="help-step">
+        <div class="help-step-num">02</div>
+        <div class="help-step-body">
+          <div class="help-step-title">投稿する</div>
+          <div class="help-step-desc">右上の「＋ 投稿する」から施設を検索して写真とコメントを記録できます。1日5件まで投稿可能です。</div>
+        </div>
+      </div>
+      <div class="help-step">
+        <div class="help-step-num">03</div>
+        <div class="help-step-body">
+          <div class="help-step-title">お気に入り ＆ ランキング</div>
+          <div class="help-step-desc">投稿にハートをつけてお気に入り登録。「✦ ランキング」からお気に入り数TOP10と新着10件を確認できます。</div>
+        </div>
+      </div>
+      <div class="help-step">
+        <div class="help-step-num">04</div>
+        <div class="help-step-body">
+          <div class="help-step-title">経路案内</div>
+          <div class="help-step-desc">投稿の詳細から「経路」ボタンを押すとGoogle Mapsが起動し、その場所までのルートが表示されます。</div>
+        </div>
+      </div>
+    </div>
+    <button id="help-start-btn" onclick="closeHelp()">はじめる</button>
+    <div id="help-dont-show">
+      <label><input type="checkbox" id="help-no-show-chk"> 次回から表示しない</label>
     </div>
   </div>
 </div>
@@ -545,20 +623,30 @@ async function loadRankTab(tab) {
   const list = document.getElementById("ranking-list");
   list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:30px;font-size:13px">読み込み中...</div>';
   try {
-    let q;
-    if (tab === "fav") {
-      q = query(collection(db,"pins"), where("report_count","<",3), orderBy("report_count"), orderBy("favorite_count","desc"), limit(20));
-    } else {
-      q = query(collection(db,"pins"), where("report_count","<",3), orderBy("report_count"), orderBy("created_at","desc"), limit(10));
-    }
+    // インデックス不要のシンプルクエリ（クライアント側でソート）
+    const q = query(collection(db,"pins"), where("report_count","<",3), orderBy("report_count"), limit(200));
     const snap = await getDocs(q);
-    list.innerHTML = "";
-    let rank = 0;
+    let posts = [];
     snap.forEach(d => {
       const data = d.data();
       if (data.report_count >= 3 || data.admin_hidden) return;
-      if (rank >= 10) return;
-      rank++;
+      posts.push({id: d.id, ...data});
+    });
+    // クライアント側でソート
+    if (tab === "fav") {
+      posts.sort((a,b) => (b.favorite_count||0) - (a.favorite_count||0));
+    } else {
+      posts.sort((a,b) => {
+        const ta = a.created_at?.toDate?.()?.getTime() || 0;
+        const tb = b.created_at?.toDate?.()?.getTime() || 0;
+        return tb - ta;
+      });
+    }
+    posts = posts.slice(0, 10);
+    list.innerHTML = "";
+    if (!posts.length) { list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:30px;font-size:13px">まだ投稿がありません</div>'; return; }
+    posts.forEach((data, idx) => {
+      const rank = idx + 1;
       const images = Array.isArray(data.image_urls) ? data.image_urls : (data.image_url ? [data.image_url] : []);
       const firstImg = images[0] || null;
       const timeStr = data.created_at ? new Date(data.created_at.toDate()).toLocaleDateString("ja-JP") : "";
@@ -577,10 +665,9 @@ async function loadRankTab(tab) {
             <span>${timeStr}</span>
           </div>
         </div>`;
-      card.onclick = () => { closeRanking(); openDetailModal(data, d.id); };
+      card.onclick = () => { closeRanking(); openDetailModal(data, data.id); };
       list.appendChild(card);
     });
-    if (rank === 0) list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:30px;font-size:13px">まだ投稿がありません</div>';
   } catch(e) {
     console.warn("loadRankTab error:", e);
     list.innerHTML = `<div style="text-align:center;color:var(--muted);padding:30px;font-size:13px">読み込みエラー<br><small>${e.message}</small></div>`;
@@ -588,10 +675,12 @@ async function loadRankTab(tab) {
 }
 
 // ===== Detail Modal =====
+let _currentDetailData = null;
 window.openDetailModal = function(data, postId) {
   const images = Array.isArray(data.image_urls) ? data.image_urls : (data.image_url ? [data.image_url] : []);
   currentDetailImages = images; currentSlideIndex = 0;
   currentDetailPostId = postId; reportTargetPostId = postId;
+  _currentDetailData = data;
   document.getElementById("detail-place").textContent = data.place_name || "";
   document.getElementById("detail-comment").textContent = data.comment || "";
   document.getElementById("detail-time").textContent = data.created_at ? new Date(data.created_at.toDate()).toLocaleDateString("ja-JP") : "";
@@ -849,7 +938,41 @@ window.showToast=function(msg,type=""){
 function hideLoading(){const l=document.getElementById("loading");l.classList.add("hidden");setTimeout(()=>l.style.display="none",600);}
 function esc(str){return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
 
+// ===== 使い方モーダル =====
+window.openHelp = function() { document.getElementById("help-overlay").classList.add("open"); };
+window.closeHelp = function() {
+  const chk = document.getElementById("help-no-show-chk");
+  if (chk && chk.checked) { try { localStorage.setItem("dcmap_help_skip","1"); } catch(e) {} }
+  document.getElementById("help-overlay").classList.remove("open");
+};
+window.handleHelpOverlayClick = function(e) { if (e.target===document.getElementById("help-overlay")) closeHelp(); };
+function maybeShowHelp() {
+  try { if (localStorage.getItem("dcmap_help_skip")) return; } catch(e) {}
+  setTimeout(() => document.getElementById("help-overlay").classList.add("open"), 800);
+}
+
+// ===== 経路案内 =====
+window.openNavigation = function() {
+  if (!currentDetailPostId) return;
+  // 現在表示中の投稿データからlatlngを取得
+  const postData = _currentDetailData;
+  if (!postData) return;
+  const lat = postData.lat, lng = postData.lng;
+  const name = encodeURIComponent(postData.place_name || "");
+  // Google Maps アプリ / ブラウザ両対応のURL
+  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+  let url;
+  if (isIOS) {
+    // iOS: Google Maps アプリ起動を試み、なければApple Maps
+    url = `https://maps.google.com/maps?daddr=${lat},${lng}&q=${name}`;
+  } else {
+    url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=${postData.place_id||""}&travelmode=transit`;
+  }
+  window.open(url, "_blank", "noopener");
+};
+
 init();
+maybeShowHelp();
 </script>
 </body>
 </html>
