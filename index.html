@@ -20,6 +20,10 @@ html, body { height:100%; overflow:hidden; font-family:'Syne',sans-serif; backgr
 #header-title { font-size:18px; letter-spacing:0.12em; font-weight:300; pointer-events:auto; text-decoration:none; color:var(--text); }
 #header-title span { color:var(--accent); }
 #header-right { display:flex; gap:8px; pointer-events:auto; }
+#location-btn { background:rgba(126,207,255,0.06); border:1px solid rgba(126,207,255,0.2); color:var(--accent2); font-size:15px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; }
+#location-btn:hover { background:rgba(126,207,255,0.14); border-color:rgba(126,207,255,0.4); }
+#location-btn.locating { animation:locating-pulse 1s ease-in-out infinite; }
+@keyframes locating-pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
 #help-btn { background:rgba(200,180,255,0.06); border:1px solid var(--border); color:var(--muted); font-family:'Syne',sans-serif; font-size:14px; font-weight:700; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; }
 #help-btn:hover { background:rgba(200,180,255,0.14); border-color:rgba(200,180,255,0.3); color:var(--accent); }
 #ranking-btn { background:rgba(200,180,255,0.06); border:1px solid var(--border); color:var(--muted); font-family:'Syne',sans-serif; font-size:12px; letter-spacing:0.08em; padding:8px 16px; cursor:pointer; transition:all 0.3s; backdrop-filter:blur(8px); }
@@ -72,14 +76,10 @@ html, body { height:100%; overflow:hidden; font-family:'Syne',sans-serif; backgr
 #ranking-overlay.open { opacity:1; pointer-events:auto; }
 #ranking-modal { width:560px; max-width:calc(100vw - 32px); max-height:88vh; background:var(--surface); border:1px solid rgba(200,180,255,0.2); display:flex; flex-direction:column; transform:translateY(16px); transition:transform 0.3s; }
 #ranking-overlay.open #ranking-modal { transform:translateY(0); }
-#ranking-top { padding:20px 20px 0; display:flex; align-items:center; justify-content:end; flex-shrink:0; }
-/* #ranking-top h2 { font-size:14px; letter-spacing:0.1em; color:var(--accent); font-weight:400; } */
+#ranking-top { padding:20px 20px 0; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+#ranking-top h2 { font-size:14px; letter-spacing:0.1em; color:var(--accent); font-weight:400; }
 #ranking-close { background:none; border:none; color:var(--muted); cursor:pointer; font-size:20px; padding:2px; transition:color 0.2s; }
 #ranking-close:hover { color:var(--accent); }
-#ranking-tabs { display:flex; border-bottom:1px solid var(--border); margin:14px 20px 0; flex-shrink:0; }
-.rtab { padding:10px 18px; font-size:12px; letter-spacing:0.06em; color:var(--muted); background:none; border:none; border-bottom:2px solid transparent; cursor:pointer; font-family:'Syne',sans-serif; transition:all 0.2s; }
-.rtab:hover { color:var(--text); }
-.rtab.active { color:var(--accent); border-bottom-color:var(--accent); }
 #ranking-list { flex:1; overflow-y:auto; padding:14px 20px 20px; display:flex; flex-direction:column; gap:10px; }
 #ranking-list::-webkit-scrollbar { width:4px; }
 #ranking-list::-webkit-scrollbar-thumb { background:rgba(200,180,255,0.2); border-radius:2px; }
@@ -247,8 +247,9 @@ html, body { height:100%; overflow:hidden; font-family:'Syne',sans-serif; backgr
 <div id="header">
   <a href="/" id="header-title">DREAM<span>CORE</span> MAP</a>
   <div id="header-right">
+    <button id="location-btn" onclick="goToMyLocation()" title="現在地">◎</button>
     <button id="help-btn" onclick="openHelp()" title="使い方">？</button>
-    <button id="ranking-btn" onclick="openRanking()">✦ ランキング</button>
+    <button id="ranking-btn" onclick="openRanking()">✦ 新着</button>
     <button id="post-btn" onclick="openModal()">+ 投稿する</button>
   </div>
 </div>
@@ -274,11 +275,8 @@ html, body { height:100%; overflow:hidden; font-family:'Syne',sans-serif; backgr
 <div id="ranking-overlay" onclick="handleRankingOverlayClick(event)">
   <div id="ranking-modal">
     <div id="ranking-top">
+      <h2>✦ 新着投稿</h2>
       <button id="ranking-close" onclick="closeRanking()">✕</button>
-    </div>
-    <div id="ranking-tabs">
-      <button class="rtab active" id="rtab-fav" onclick="switchRankTab('fav',this)">❤ お気に入り TOP 10</button>
-      <button class="rtab" id="rtab-new" onclick="switchRankTab('new',this)">✦ 新着 10件</button>
     </div>
     <div id="ranking-list"></div>
   </div>
@@ -384,8 +382,8 @@ html, body { height:100%; overflow:hidden; font-family:'Syne',sans-serif; backgr
       <div class="help-step">
         <div class="help-step-num">03</div>
         <div class="help-step-body">
-          <div class="help-step-title">お気に入り ＆ ランキング</div>
-          <div class="help-step-desc">投稿にハートをつけてお気に入り登録。「✦ ランキング」からお気に入り数TOP10と新着10件を確認できます。</div>
+          <div class="help-step-title">お気に入り ＆ 新着</div>
+          <div class="help-step-desc">投稿にハートをつけてお気に入り登録。右上の「✦ 新着」から最近投稿された10件をまとめて確認できます。</div>
         </div>
       </div>
       <div class="help-step">
@@ -393,6 +391,15 @@ html, body { height:100%; overflow:hidden; font-family:'Syne',sans-serif; backgr
         <div class="help-step-body">
           <div class="help-step-title">経路案内</div>
           <div class="help-step-desc">投稿の詳細から「経路」ボタンを押すとGoogle Mapsが起動し、その場所までのルートが表示されます。</div>
+        </div>
+      </div>
+      <div class="help-step">
+        <div class="help-step-num">00</div>
+        <div class="help-step-body">
+          <div class="help-step-title">お問い合わせ・サポート</div>
+          <div class="help-step-desc">
+            <a href="#">ここから</a>
+          </div>
         </div>
       </div>
     </div>
@@ -464,7 +471,6 @@ let currentDetailImages = [], currentSlideIndex = 0;
 let currentDetailPostId = null;
 let currentShareUrl = "";
 let myFavorites = new Set();
-let currentRankTab = "fav";
 
 // ===== お気に入りをlocalStorageで永続化 =====
 function loadMyFavs() {
@@ -606,24 +612,16 @@ window.closePanel = function() {
 // ===== Ranking =====
 window.openRanking = async function() {
   document.getElementById("ranking-overlay").classList.add("open");
-  await loadRankTab(currentRankTab);
+  await loadRankTab("new");
 };
 window.closeRanking = function() { document.getElementById("ranking-overlay").classList.remove("open"); };
 window.handleRankingOverlayClick = function(e) { if (e.target === document.getElementById("ranking-overlay")) closeRanking(); };
 
-window.switchRankTab = async function(tab, btn) {
-  currentRankTab = tab;
-  document.querySelectorAll(".rtab").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
-  await loadRankTab(tab);
-};
-
-async function loadRankTab(tab) {
+async function loadRankTab() {
   const list = document.getElementById("ranking-list");
   list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:30px;font-size:13px">読み込み中...</div>';
   try {
-    // インデックス不要のシンプルクエリ（クライアント側でソート）
-    const q = query(collection(db,"pins"), where("report_count","<",3), orderBy("report_count"), limit(200));
+    const q = query(collection(db,"pins"), where("report_count","<",3), orderBy("report_count"), orderBy("created_at","desc"), limit(10));
     const snap = await getDocs(q);
     let posts = [];
     snap.forEach(d => {
@@ -631,36 +629,23 @@ async function loadRankTab(tab) {
       if (data.report_count >= 3 || data.admin_hidden) return;
       posts.push({id: d.id, ...data});
     });
-    // クライアント側でソート
-    if (tab === "fav") {
-      posts.sort((a,b) => (b.favorite_count||0) - (a.favorite_count||0));
-    } else {
-      posts.sort((a,b) => {
-        const ta = a.created_at?.toDate?.()?.getTime() || 0;
-        const tb = b.created_at?.toDate?.()?.getTime() || 0;
-        return tb - ta;
-      });
-    }
-    posts = posts.slice(0, 10);
     list.innerHTML = "";
     if (!posts.length) { list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:30px;font-size:13px">まだ投稿がありません</div>'; return; }
     posts.forEach((data, idx) => {
-      const rank = idx + 1;
       const images = Array.isArray(data.image_urls) ? data.image_urls : (data.image_url ? [data.image_url] : []);
       const firstImg = images[0] || null;
-      const timeStr = data.created_at ? new Date(data.created_at.toDate()).toLocaleDateString("ja-JP") : "";
+      const timeStr = data.created_at ? new Date(data.created_at.toDate()).toLocaleString("ja-JP", {month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}) : "";
       const favCount = data.favorite_count || 0;
-      const numCls = rank===1?"top1":rank===2?"top2":rank===3?"top3":"";
       const card = document.createElement("div");
       card.className = "rank-card";
       card.innerHTML = `
-        <div class="rank-num ${numCls}">${rank}</div>
+        <div class="rank-num">${idx+1}</div>
         ${firstImg ? `<img class="rank-thumb" src="${firstImg}" alt="" loading="lazy">` : `<div class="rank-thumb" style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:10px">画像なし</div>`}
         <div class="rank-info">
           <div class="rank-place">${esc(data.place_name||"")}</div>
           <div class="rank-comment">${esc(data.comment||"")}</div>
           <div class="rank-meta">
-            <span class="rank-fav">❤ ${favCount}</span>
+            ${favCount > 0 ? `<span class="rank-fav">❤ ${favCount}</span>` : ""}
             <span>${timeStr}</span>
           </div>
         </div>`;
@@ -669,7 +654,7 @@ async function loadRankTab(tab) {
     });
   } catch(e) {
     console.warn("loadRankTab error:", e);
-    list.innerHTML = `<div style="text-align:center;color:var(--muted);padding:30px;font-size:13px">読み込みエラー<br><small>${e.message}</small></div>`;
+    list.innerHTML = `<div style="text-align:center;color:var(--muted);padding:30px;font-size:13px">読み込みエラー<br><small style="font-size:10px">${e.message}</small></div>`;
   }
 }
 
@@ -936,6 +921,35 @@ window.showToast=function(msg,type=""){
 };
 function hideLoading(){const l=document.getElementById("loading");l.classList.add("hidden");setTimeout(()=>l.style.display="none",600);}
 function esc(str){return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+
+// ===== 現在地 =====
+window.goToMyLocation = function() {
+  if (!navigator.geolocation) { showToast("位置情報がサポートされていません","err"); return; }
+  const btn = document.getElementById("location-btn");
+  btn.classList.add("locating");
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      btn.classList.remove("locating");
+      const lat = pos.coords.latitude, lng = pos.coords.longitude;
+      map.panTo({lat, lng});
+      map.setZoom(15);
+      // 現在地マーカー（一時的に表示）
+      if (window._myLocMarker) window._myLocMarker.setMap(null);
+      window._myLocMarker = new google.maps.Marker({
+        map, position:{lat,lng},
+        icon:{ path:google.maps.SymbolPath.CIRCLE, scale:8, fillColor:"#7ecfff", fillOpacity:0.9, strokeColor:"#fff", strokeWeight:2 },
+        zIndex:20
+      });
+      showToast("現在地に移動しました","ok");
+    },
+    err => {
+      btn.classList.remove("locating");
+      if (err.code === 1) showToast("位置情報の許可が必要です","err");
+      else showToast("現在地を取得できませんでした","err");
+    },
+    {timeout:10000, enableHighAccuracy:true}
+  );
+};
 
 // ===== 使い方モーダル =====
 window.openHelp = function() { document.getElementById("help-overlay").classList.add("open"); };
