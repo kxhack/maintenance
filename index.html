@@ -261,6 +261,14 @@ html, body { height:100%; overflow:hidden; font-family:'Syne',sans-serif; backgr
 @keyframes pulse { 0%,100%{opacity:0.2;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }
 * { scrollbar-width:thin; scrollbar-color:rgba(200,180,255,0.2) transparent; }
 </style>
+<!-- Google Maps & MarkerClusterer: ES moduleの外で読み込む（callback問題を回避） -->
+<script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
+<script>
+  function initMap() {
+    // ES moduleのinitMapWrapperを呼ぶ
+    if (window._initMapWrapper) window._initMapWrapper();
+  }
+</script>
 </head>
 <body>
 
@@ -533,17 +541,21 @@ async function init() {
 
 // ===== Google Maps =====
 function loadGoogleMaps() {
-  // MarkerClustererをロード
-  const mcs = document.createElement("script");
-  mcs.src = "https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js";
-  document.head.appendChild(mcs);
+  // initMapWrapperをwindowに登録してからMaps APIを読み込む
+  window._initMapWrapper = initMapCore;
   const s = document.createElement("script");
-  s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places,marker&language=ja&region=JP&loading=async&callback=initMap`;
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places&language=ja&region=JP&callback=initMap`;
   s.async = true; s.defer = true;
   document.head.appendChild(s);
 }
 
-window.initMap = async function() {
+async function initMapCore() {
+  // AdvancedMarkerElement が使える場合だけ有効化（marker library未ロードでも動くように）
+  try {
+    if (google.maps.marker && google.maps.marker.AdvancedMarkerElement) {
+      window._useAdvancedMarker = true;
+    }
+  } catch(e) { window._useAdvancedMarker = false; }
   map = new google.maps.Map(document.getElementById("map"), {
     center:{lat:35.6762,lng:139.6503}, zoom:12,
     zoomControl:true, mapTypeControl:false, streetViewControl:false, fullscreenControl:false,
@@ -598,11 +610,12 @@ function initClusterer() {
       el.style.cssText = `cursor:pointer;filter:drop-shadow(0 4px 14px rgba(200,180,255,0.6));transition:transform 0.2s;`;
       el.onmouseenter = () => el.style.transform = "scale(1.15)";
       el.onmouseleave = () => el.style.transform = "scale(1)";
-      try {
-        return new google.maps.marker.AdvancedMarkerElement({ position, content: el, zIndex: 999 });
-      } catch(e) {
-        return new google.maps.Marker({ position, icon: { url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`, scaledSize: new google.maps.Size(size, size), anchor: new google.maps.Point(size/2, size/2) }, zIndex: 999 });
+      if (window._useAdvancedMarker) {
+        try {
+          return new google.maps.marker.AdvancedMarkerElement({ position, content: el, zIndex: 999 });
+        } catch(e) {}
       }
+      return new google.maps.Marker({ position, icon: { url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`, scaledSize: new google.maps.Size(size, size), anchor: new google.maps.Point(size/2, size/2) }, zIndex: 999 });
     }
   };
   clusterer = new markerClusterer.MarkerClusterer({ map, markers: markerList, renderer });
@@ -622,10 +635,13 @@ function addMarker(placeId, data) {
     openPanel(data.place_id, data.place_name);
   };
   let marker;
-  try {
-    marker = new google.maps.marker.AdvancedMarkerElement({map, position:{lat:data.lat,lng:data.lng}, content:el, title:data.place_name});
-    marker.addListener("click", clickFn);
-  } catch(e) {
+  if (window._useAdvancedMarker) {
+    try {
+      marker = new google.maps.marker.AdvancedMarkerElement({map, position:{lat:data.lat,lng:data.lng}, content:el, title:data.place_name});
+      marker.addListener("click", clickFn);
+    } catch(e) { window._useAdvancedMarker = false; }
+  }
+  if (!marker) {
     marker = new google.maps.Marker({
       map, position:{lat:data.lat,lng:data.lng}, title:data.place_name,
       icon:{url:`data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svgStr)}`,scaledSize:new google.maps.Size(36,44),anchor:new google.maps.Point(18,44)},
