@@ -17,8 +17,9 @@
 html, body { height:100%; overflow:hidden; font-family:'Syne',sans-serif; background:var(--bg); color:var(--text); }
 
 #header { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:16px 24px; background:linear-gradient(to bottom,rgba(6,5,15,0.98),transparent); pointer-events:none; }
-#header-title { font-size:18px; letter-spacing:0.12em; font-weight:300; pointer-events:auto; text-decoration:none; color:var(--text); }
+#header-title { font-size:18px; letter-spacing:0.12em; font-weight:300; pointer-events:auto; text-decoration:none; color:var(--text); display:flex; align-items:baseline; gap:6px; }
 #header-title span { color:var(--accent); }
+#ver-badge { font-size:9px; letter-spacing:0.06em; color:var(--muted); font-family:'Syne',sans-serif; font-weight:400; background:rgba(200,180,255,0.08); border:1px solid rgba(200,180,255,0.15); padding:2px 5px; vertical-align:super; font-style:normal; }
 #header-right { display:flex; gap:8px; pointer-events:auto; }
 #location-btn { background:rgba(126,207,255,0.06); border:1px solid rgba(126,207,255,0.2); color:var(--accent2); font-size:15px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; }
 #location-btn:hover { background:rgba(126,207,255,0.14); border-color:rgba(126,207,255,0.4); }
@@ -269,10 +270,14 @@ html, body { height:100%; overflow:hidden; font-family:'Syne',sans-serif; backgr
 </div>
 
 <div id="header">
-  <a href="/" id="header-title">DREAM<span>CORE</span> MAP</a>
+  <a href="/" id="header-title">DREAM<span>CORE</span> MAP<sup id="ver-badge">v1</sup></a>
   <div id="header-right">
-    <button id="location-btn" onclick="goToMyLocation()" title="現在地">◎</button>
-    <button id="help-btn" onclick="openHelp()" title="使い方">？</button>
+    <button id="location-btn" onclick="goToMyLocation()" title="現在地">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+    </button>
+    <button id="help-btn" onclick="openHelp()" title="使い方">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </button>
     <button id="ranking-btn" onclick="openRanking()">✦ 新着</button>
     <button id="post-btn" onclick="openModal()">+ 投稿する</button>
     <button id="hamburger-btn" onclick="toggleDrawer()" aria-label="メニュー">
@@ -288,15 +293,15 @@ html, body { height:100%; overflow:hidden; font-family:'Syne',sans-serif; backgr
 <div id="sp-drawer-backdrop" onclick="closeDrawer()"></div>
 <div id="sp-drawer">
   <button class="drawer-item" onclick="goToMyLocationDrawer()">
-    <span class="drawer-item-icon" style="color:var(--accent2)">◎</span>
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" style="color:var(--accent2);flex-shrink:0"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
     現在地を表示
   </button>
   <button class="drawer-item" onclick="openRankingDrawer()">
-    <span class="drawer-item-icon" style="color:var(--accent)">✦</span>
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" style="color:var(--accent);flex-shrink:0"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
     新着投稿
   </button>
   <button class="drawer-item" onclick="openHelpDrawer()">
-    <span class="drawer-item-icon">？</span>
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     使い方
   </button>
   <button class="drawer-post-btn" onclick="openModalDrawer()">+ 投稿する</button>
@@ -502,7 +507,7 @@ const storage = getStorage(app);
 let map, autocompleteService, placesService;
 let selectedPlace = null, selectedFiles = [];
 let currentPanelPlaceId = null, reportTargetPostId = null;
-let markers = {}, currentUserId = null;
+let markers = {}, markerList = [], clusterer = null, currentUserId = null;
 let currentDetailImages = [], currentSlideIndex = 0;
 let currentDetailPostId = null;
 let currentShareUrl = "";
@@ -528,8 +533,12 @@ async function init() {
 
 // ===== Google Maps =====
 function loadGoogleMaps() {
+  // MarkerClustererをロード
+  const mcs = document.createElement("script");
+  mcs.src = "https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js";
+  document.head.appendChild(mcs);
   const s = document.createElement("script");
-  s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places&language=ja&region=JP&loading=async&callback=initMap`;
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places,marker&language=ja&region=JP&loading=async&callback=initMap`;
   s.async = true; s.defer = true;
   document.head.appendChild(s);
 }
@@ -567,7 +576,36 @@ async function loadAllPins() {
       const data = d.data();
       if (!seen.has(data.place_id)) { seen.add(data.place_id); addMarker(data.place_id, data); }
     });
+    initClusterer();
   } catch(e) { console.warn("loadAllPins:", e); }
+}
+
+function initClusterer() {
+  if (typeof markerClusterer === "undefined" || !window.markerClusterer) return;
+  if (clusterer) clusterer.clearMarkers();
+  // ドリームコアテーマのカスタムレンダラー
+  const renderer = {
+    render({ count, position }) {
+      const size = count < 5 ? 38 : count < 15 ? 44 : 52;
+      const opacity = count < 5 ? 0.85 : 0.95;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+        <circle cx="${size/2}" cy="${size/2}" r="${size/2-2}" fill="rgba(26,21,53,${opacity})" stroke="#c8b4ff" stroke-width="1.5"/>
+        <circle cx="${size/2}" cy="${size/2}" r="${size/2-6}" fill="none" stroke="rgba(200,180,255,0.3)" stroke-width="1"/>
+        <text x="${size/2}" y="${size/2+5}" text-anchor="middle" font-family="Syne,sans-serif" font-size="${size < 44 ? 12 : 14}" font-weight="700" fill="#c8b4ff">${count}</text>
+      </svg>`;
+      const el = document.createElement("div");
+      el.innerHTML = svg;
+      el.style.cssText = `cursor:pointer;filter:drop-shadow(0 4px 14px rgba(200,180,255,0.6));transition:transform 0.2s;`;
+      el.onmouseenter = () => el.style.transform = "scale(1.15)";
+      el.onmouseleave = () => el.style.transform = "scale(1)";
+      try {
+        return new google.maps.marker.AdvancedMarkerElement({ position, content: el, zIndex: 999 });
+      } catch(e) {
+        return new google.maps.Marker({ position, icon: { url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`, scaledSize: new google.maps.Size(size, size), anchor: new google.maps.Point(size/2, size/2) }, zIndex: 999 });
+      }
+    }
+  };
+  clusterer = new markerClusterer.MarkerClusterer({ map, markers: markerList, renderer });
 }
 
 function addMarker(placeId, data) {
@@ -579,9 +617,9 @@ function addMarker(placeId, data) {
   el.onmouseenter = () => el.style.transform = "scale(1.2)";
   el.onmouseleave = () => el.style.transform = "scale(1)";
   const clickFn = () => {
+    // ズームせずパンのみ（ズームはしない）
     map.panTo({lat:data.lat,lng:data.lng});
-    if (map.getZoom()<15) map.setZoom(15);
-    setTimeout(() => openPanel(data.place_id, data.place_name), 300);
+    openPanel(data.place_id, data.place_name);
   };
   let marker;
   try {
@@ -596,6 +634,9 @@ function addMarker(placeId, data) {
     marker.addListener("click", clickFn);
   }
   markers[placeId] = marker;
+  markerList.push(marker);
+  // clustererが既に初期化済みなら追加（投稿後など）
+  if (clusterer) { clusterer.clearMarkers(); clusterer.addMarkers(markerList); }
 }
 
 // ===== Panel =====
